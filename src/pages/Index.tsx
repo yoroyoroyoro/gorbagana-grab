@@ -1,14 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
 import GameHeader from '@/components/GameHeader';
 import GameArea from '@/components/GameArea';
-import StatsPage from '@/components/StatsPage';
-import LeaderboardPage from '@/components/LeaderboardPage';
-import RecentGamesPage from '@/components/RecentGamesPage';
+import Navigation from '@/components/Navigation';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
 import { gorConnection } from '@/utils/gorConnection';
 import { PublicKey } from '@solana/web3.js';
@@ -30,16 +26,9 @@ interface GameEntry {
   prize: number;
 }
 
-interface LeaderboardEntry {
-  rank: number;
-  address: string;
-  totalWinnings: number;
-  gamesWon: number;
-}
-
 const Index = () => {
   // Wallet integration
-  const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect } = useBackpackWallet();
+  const { isConnected, publicKey, isLoading, connect: connectWallet } = useBackpackWallet();
   const [gorBalance, setGorBalance] = useState<number>(0);
 
   // Game state
@@ -57,18 +46,6 @@ const Index = () => {
     winRate: 0
   });
 
-  // Mock leaderboard data
-  const [leaderboard] = useState<LeaderboardEntry[]>([
-    { rank: 1, address: '8K7qX2vN9mB3pL4wR5tY6uI7oP8aS9dF', totalWinnings: 23.45, gamesWon: 12 },
-    { rank: 2, address: '9M4tE6rY8uI3oP2aS7dF5gH1jK9lZ3xC', totalWinnings: 18.92, gamesWon: 8 },
-    { rank: 3, address: '7B2nV5mK9lP4wR8tY3uI6oS1aD4fG7hJ', totalWinnings: 15.67, gamesWon: 6 },
-    { rank: 4, address: '6C8vB4nM2kL9pW5rT7yU1iO3sA6dF9gH', totalWinnings: 12.34, gamesWon: 4 },
-    { rank: 5, address: '5F3gH7jK1lZ9xC2vB8nM4kP6wR5tY9uI', totalWinnings: 9.81, gamesWon: 3 }
-  ]);
-
-  // Recent games data
-  const [recentGames, setRecentGames] = useState<GameEntry[]>([]);
-
   // Timer countdown
   useEffect(() => {
     const timer = setInterval(() => {
@@ -77,7 +54,7 @@ const Index = () => {
           // Round ended, reset
           toast.success('Round ended! New round starting...');
           setPrizePool(0);
-          setRecentGames([]);
+          localStorage.removeItem('recentGames');
           return 86400; // Reset to 24 hours
         }
         return prev - 1;
@@ -91,6 +68,7 @@ const Index = () => {
   useEffect(() => {
     if (isConnected && publicKey) {
       checkGorBalance();
+      loadPlayerStats();
     }
   }, [isConnected, publicKey]);
 
@@ -106,20 +84,37 @@ const Index = () => {
     }
   };
 
-  const handleConnectWallet = async () => {
-    await connectWallet();
+  const loadPlayerStats = () => {
+    if (!publicKey) return;
+    
+    const savedStats = localStorage.getItem(`playerStats_${publicKey}`);
+    if (savedStats) {
+      setPlayerStats(JSON.parse(savedStats));
+    } else {
+      setPlayerStats({
+        walletAddress: publicKey,
+        totalWinnings: 0,
+        gamesPlayed: 0,
+        bestScore: 0,
+        winRate: 0
+      });
+    }
   };
 
-  const handleDisconnectWallet = async () => {
-    await disconnect();
-    setGorBalance(0);
-    setPlayerStats({
-      walletAddress: '',
-      totalWinnings: 0,
-      gamesPlayed: 0,
-      bestScore: 0,
-      winRate: 0
-    });
+  const savePlayerStats = (stats: PlayerData) => {
+    if (!publicKey) return;
+    localStorage.setItem(`playerStats_${publicKey}`, JSON.stringify(stats));
+    setPlayerStats(stats);
+  };
+
+  const saveGameToRecent = (gameEntry: GameEntry) => {
+    const existingGames = JSON.parse(localStorage.getItem('recentGames') || '[]');
+    const updatedGames = [gameEntry, ...existingGames.slice(0, 9)];
+    localStorage.setItem('recentGames', JSON.stringify(updatedGames));
+  };
+
+  const handleConnectWallet = async () => {
+    await connectWallet();
   };
 
   const handleStartGame = async () => {
@@ -154,10 +149,11 @@ const Index = () => {
       setCurrentScore(null);
       
       // Update player stats
-      setPlayerStats(prev => ({
-        ...prev,
-        gamesPlayed: prev.gamesPlayed + 1
-      }));
+      const updatedStats = {
+        ...playerStats,
+        gamesPlayed: playerStats.gamesPlayed + 1
+      };
+      savePlayerStats(updatedStats);
 
       // Update balance
       setGorBalance(prev => prev - 0.05);
@@ -186,61 +182,55 @@ const Index = () => {
       toast.success(`INSTANT JACKPOT! You won ${prizePool.toFixed(2)} GOR!`);
       
       // Update player stats
-      setPlayerStats(prev => ({
-        ...prev,
-        totalWinnings: prev.totalWinnings + prizePool,
-        bestScore: Math.max(prev.bestScore, score),
-        winRate: ((prev.gamesPlayed * prev.winRate / 100) + 1) / (prev.gamesPlayed) * 100
-      }));
+      const updatedStats = {
+        ...playerStats,
+        totalWinnings: playerStats.totalWinnings + prizePool,
+        bestScore: Math.max(playerStats.bestScore, score),
+        winRate: ((playerStats.gamesPlayed * playerStats.winRate / 100) + 1) / (playerStats.gamesPlayed) * 100
+      };
+      savePlayerStats(updatedStats);
       
       // Reset round
       setPrizePool(0);
       setTimeRemaining(86400);
-      setRecentGames([]);
+      localStorage.removeItem('recentGames');
     } else {
       // Update best score if needed
-      setPlayerStats(prev => ({
-        ...prev,
-        bestScore: Math.max(prev.bestScore, score)
-      }));
+      const updatedStats = {
+        ...playerStats,
+        bestScore: Math.max(playerStats.bestScore, score)
+      };
+      savePlayerStats(updatedStats);
       
       toast.success(`Score: ${score}! ${score >= 90 ? 'Excellent!' : score >= 70 ? 'Great!' : 'Keep trying!'}`);
     }
 
     // Add to recent games
-    setRecentGames(prev => [gameEntry, ...prev.slice(0, 9)]);
+    saveGameToRecent(gameEntry);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent neon-text mb-2">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent neon-text mb-2">
             GORBAGANA GRAB
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-sm sm:text-lg px-2">
             Time your tap. Win the pot. Gorbagana testnet precision gaming.
           </p>
-          <div className="flex justify-center items-center gap-4 mt-4">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 mt-4">
             {isConnected && (
-              <p className="text-sm text-accent">
+              <p className="text-xs sm:text-sm text-accent">
                 Balance: {gorBalance.toFixed(4)} GOR
               </p>
             )}
-            {isConnected && (
-              <Button 
-                onClick={handleDisconnectWallet}
-                variant="outline"
-                size="sm"
-                className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Disconnect
-              </Button>
-            )}
           </div>
         </div>
+
+        {/* Navigation */}
+        <Navigation />
 
         {/* Game Header */}
         <GameHeader
@@ -253,66 +243,41 @@ const Index = () => {
 
         {/* Wallet Connection Status */}
         {!isConnected && (
-          <div className="text-center mb-6 p-4 bg-card/50 border border-border rounded-lg">
-            <p className="text-muted-foreground mb-2">
+          <div className="text-center mb-6 p-4 bg-card/50 border border-border rounded-lg mx-2 sm:mx-0">
+            <p className="text-muted-foreground mb-2 text-sm sm:text-base">
               Connect your Backpack wallet to start playing
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Make sure you're connected to the Gorbagana testnet (RPC: https://rpc.gorbagana.wtf/)
             </p>
           </div>
         )}
 
         {/* Game Area */}
-        <GameArea
-          isPlaying={isPlaying}
-          onStop={handleGameStop}
-          onStartGame={handleStartGame}
-          canPlay={isConnected && gorBalance >= 0.05}
-        />
+        <div className="px-2 sm:px-0">
+          <GameArea
+            isPlaying={isPlaying}
+            onStop={handleGameStop}
+            onStartGame={handleStartGame}
+            canPlay={isConnected && gorBalance >= 0.05}
+          />
+        </div>
 
         {/* Insufficient balance warning */}
         {isConnected && gorBalance < 0.05 && (
-          <div className="text-center mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <p className="text-destructive">
+          <div className="text-center mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg mx-2 sm:mx-0">
+            <p className="text-destructive text-sm sm:text-base">
               Insufficient GOR balance. You need at least 0.05 GOR to play.
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Current balance: {gorBalance.toFixed(4)} GOR
             </p>
           </div>
         )}
 
-        {/* Tabbed Content */}
-        <Tabs defaultValue="stats" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="stats">Player Stats</TabsTrigger>
-            <TabsTrigger value="leaderboard">Global Leaderboard</TabsTrigger>
-            <TabsTrigger value="recent">Recent Games</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="stats">
-            <StatsPage
-              walletAddress={publicKey}
-              totalWinnings={playerStats.totalWinnings}
-              gamesPlayed={playerStats.gamesPlayed}
-              bestScore={playerStats.bestScore}
-              winRate={playerStats.winRate}
-            />
-          </TabsContent>
-          
-          <TabsContent value="leaderboard">
-            <LeaderboardPage players={leaderboard} />
-          </TabsContent>
-          
-          <TabsContent value="recent">
-            <RecentGamesPage games={recentGames} />
-          </TabsContent>
-        </Tabs>
-
         {/* Footer */}
-        <div className="mt-12 text-center text-muted-foreground">
-          <p className="text-sm">
+        <div className="mt-8 sm:mt-12 text-center text-muted-foreground px-2 sm:px-0">
+          <p className="text-xs sm:text-sm">
             Powered by Gorbagana Testnet • RPC: https://rpc.gorbagana.wtf/
           </p>
           <p className="text-xs mt-2">
