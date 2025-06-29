@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import GameHeader from '@/components/GameHeader';
 import GameArea from '@/components/GameArea';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
@@ -349,6 +349,59 @@ const Index = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Help Icon - Bottom Right */}
+      <div className="fixed bottom-8 right-8 z-30">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="relative cursor-pointer group">
+                {/* Animated "Click Me" Text */}
+                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 text-teal-300 pixel-font text-sm animate-bounce whitespace-nowrap">
+                  CLICK ME
+                </div>
+                
+                {/* Help Icon */}
+                <div className="w-20 h-20 hover:scale-110 transition-transform duration-200">
+                  <img 
+                    src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
+                    alt="Help Character" 
+                    className="w-full h-full pixel-art hover:drop-shadow-[0_0_20px_rgba(32,178,170,0.8)]"
+                  />
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent 
+              side="left" 
+              className="max-w-sm p-4 bg-gradient-to-r from-purple-900/95 to-blue-900/95 border-purple-400/40 text-purple-100"
+            >
+              <h3 className="pixel-font text-lg mb-3 text-purple-300">ROUND SYSTEM GUIDE</h3>
+              <div className="pixel-font text-sm space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-teal-300">•</span>
+                  <span>Perfect hit (100 score) = Instant jackpot win!</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-300">•</span>
+                  <span>Each round lasts exactly 24 hours</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-cyan-300">•</span>
+                  <span>If no jackpot, highest scorer wins the prize pool</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-yellow-300">•</span>
+                  <span>Tied scores? First to achieve it wins!</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-pink-300">•</span>
+                  <span>0.05 GOR per game adds to the prize pool</span>
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   );
