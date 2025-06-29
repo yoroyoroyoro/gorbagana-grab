@@ -21,9 +21,20 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
       const startTime = Date.now();
       
       intervalRef.current = setInterval(() => {
-        const elapsed = (Date.now() - startTime) % 4000; // 4 second cycle
-        const progress = elapsed / 4000;
-        setCursorPosition(progress * 100);
+        const elapsed = (Date.now() - startTime) % 2000; // 2 second cycle (faster)
+        const progress = elapsed / 2000;
+        
+        // Create back and forth motion
+        let position;
+        if (progress <= 0.5) {
+          // First half: left to right (0 to 100)
+          position = (progress * 2) * 100;
+        } else {
+          // Second half: right to left (100 to 0)
+          position = (2 - progress * 2) * 100;
+        }
+        
+        setCursorPosition(position);
       }, 16); // ~60fps
     } else {
       if (intervalRef.current) {
