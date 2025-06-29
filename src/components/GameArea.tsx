@@ -79,9 +79,9 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
           {/* Moving Pixel Character Cursor */}
           {isPlaying && (
             <div 
-              className="absolute top-1 w-8 h-8 transition-none z-20 flex items-center justify-center"
+              className="absolute top-1 w-20 h-20 transition-none z-20 flex items-center justify-center"
               style={{ 
-                left: `calc(${cursorPosition}% - 16px)`, // Center the character
+                left: `calc(${cursorPosition}% - 40px)`, // Center the character
                 filter: 'drop-shadow(0 0 10px rgba(32, 178, 170, 0.8))'
               }}
             >
