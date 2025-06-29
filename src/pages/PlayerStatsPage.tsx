@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -45,9 +44,6 @@ const PlayerStatsPage = () => {
               BACK TO GAME
             </Link>
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold pixel-font-xl text-teal-300">
-            PLAYER STATISTICS
-          </h1>
         </div>
         
         <StatsPage

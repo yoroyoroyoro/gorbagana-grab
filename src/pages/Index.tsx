@@ -6,7 +6,7 @@ import GameArea from '@/components/GameArea';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
 import { gorConnection } from '@/utils/gorConnection';
 import { PublicKey } from '@solana/web3.js';
-import { User, Trophy, Clock } from 'lucide-react';
+import { User, Trophy, Clock, Wallet, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Mock data types
@@ -28,7 +28,7 @@ interface GameEntry {
 
 const Index = () => {
   // Wallet integration
-  const { isConnected, publicKey, isLoading, connect: connectWallet } = useBackpackWallet();
+  const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect } = useBackpackWallet();
   const [gorBalance, setGorBalance] = useState<number>(0);
   const [balanceLoaded, setBalanceLoaded] = useState(false);
 
@@ -209,6 +209,10 @@ const Index = () => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const handleDisconnectWallet = async () => {
+    await disconnect();
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Navigation Pills - Top Right */}
@@ -232,6 +236,17 @@ const Index = () => {
               RECENT
             </Link>
           </Button>
+          {isConnected && publicKey && (
+            <Button 
+              onClick={handleDisconnectWallet}
+              variant="outline" 
+              className="pixel-pill text-red-400 border-red-400/40 hover:bg-red-400/10"
+            >
+              <Wallet className="w-4 h-4 mr-2" />
+              {publicKey.slice(0, 4)}...{publicKey.slice(-4)}
+              <LogOut className="w-4 h-4 ml-2" />
+            </Button>
+          )}
         </div>
       </div>
       
@@ -280,7 +295,7 @@ const Index = () => {
           />
         </div>
 
-        {/* Wallet Connection */}
+        {/* Wallet Connection - Only show if not connected */}
         {!isConnected && (
           <div className="text-center mt-8">
             <Button 
