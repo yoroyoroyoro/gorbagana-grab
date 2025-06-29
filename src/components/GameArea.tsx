@@ -13,7 +13,6 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
   const [cursorPosition, setCursorPosition] = useState(0);
   const [gameScore, setGameScore] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout>();
-  const gameAreaRef = useRef<HTMLDivElement>(null);
 
   // Cursor sweep animation
   useEffect(() => {
@@ -51,102 +50,87 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
   };
 
   const getScoreColor = (score: number) => {
-    if (score === 100) return 'text-primary neon-text';
-    if (score >= 90) return 'text-accent';
+    if (score === 100) return 'text-green-400';
+    if (score >= 90) return 'text-cyan-400';
     if (score >= 70) return 'text-blue-400';
     if (score >= 50) return 'text-yellow-400';
-    return 'text-destructive';
+    return 'text-red-400';
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mb-8">
-      {/* Game Bar Container with Stardew Valley Styling */}
-      <div 
-        ref={gameAreaRef}
-        className="relative h-32 game-area pixel-border pixel-bevel mb-6 overflow-hidden"
-        style={{
-          backgroundImage: `url('/lovable-uploads/83da7de6-6774-4cdf-a37f-ac4431a1aa10.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          imageRendering: 'pixelated'
-        }}
-      >
-        {/* Valley dither overlay for better visibility */}
-        <div className="absolute inset-0 pixel-dither opacity-70" />
-        
-        {/* Jackpot Zone (center 10%) with valley theme */}
-        <div 
-          className="absolute top-4 h-24 jackpot-zone z-10"
-          style={{ 
-            left: '45%', 
-            width: '10%'
-          }}
-        >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="pixel-font text-primary neon-text">
-              JACKPOT
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Clean Game Container */}
+      <div className="game-container mb-8">
+        {/* Game Bar - Simplified */}
+        <div className="relative h-24 mb-6 bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-blue-900/50 border-2 border-white/20 overflow-hidden">
+          {/* Jackpot Zone - Clean design */}
+          <div 
+            className="absolute top-4 h-16 jackpot-zone flex items-center justify-center"
+            style={{ 
+              left: '45%', 
+              width: '10%'
+            }}
+          >
+            <span className="pixel-font text-green-400 neon-text text-xs">
+              ZERO
             </span>
           </div>
+
+          {/* Moving Cursor - Clean design */}
+          {isPlaying && (
+            <div 
+              className="absolute top-0 w-1 h-full bg-white shadow-lg transition-none z-20"
+              style={{ 
+                left: `${cursorPosition}%`,
+                boxShadow: '0 0 15px rgba(255, 255, 255, 0.8)'
+              }}
+            />
+          )}
+
+          {/* Score Display - Clean overlay */}
+          {gameScore !== null && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-30">
+              <div className="text-center clean-card">
+                <div className={`text-4xl font-bold ${getScoreColor(gameScore)} pixel-font-xl mb-2`}>
+                  {gameScore}
+                </div>
+                {gameScore === 100 && (
+                  <div className="text-green-400 pixel-font neon-text">
+                    JACKPOT!
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Valley-themed Cursor */}
-        {isPlaying && (
-          <div 
-            className="absolute top-0 w-3 h-full z-20 pixel-border transition-none"
-            style={{ 
-              left: `${cursorPosition}%`,
-              background: 'linear-gradient(180deg, hsl(var(--valley-teal)) 0%, hsl(var(--valley-forest)) 100%)',
-              boxShadow: '0 0 20px hsl(var(--valley-teal)), 0 0 40px hsl(var(--valley-forest))',
-              borderColor: 'hsl(var(--valley-light))'
-            }}
-          />
-        )}
+        {/* Game Controls - Clean buttons */}
+        <div className="text-center">
+          {!isPlaying ? (
+            <Button
+              onClick={onStartGame}
+              disabled={!canPlay}
+              className={canPlay ? "pixel-button-primary" : "pixel-pill opacity-50"}
+            >
+              {canPlay ? 'PAY 0.05 GOR & PLAY' : 'CONNECT WALLET'}
+            </Button>
+          ) : (
+            <Button
+              onClick={handleStop}
+              className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-bold py-4 px-8 pixel-font border-2 border-white/30"
+            >
+              STOP AT ZERO!
+            </Button>
+          )}
+        </div>
 
-        {/* Score Display with Valley styling */}
-        {gameScore !== null && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-30">
-            <div className="text-center pixel-border pixel-bevel retro-card p-8">
-              <div className={`text-5xl font-bold ${getScoreColor(gameScore)} pixel-font-xl mb-4`}>
-                {gameScore}
-              </div>
-              {gameScore === 100 && (
-                <div className="text-primary pixel-font-lg neon-text">
-                  JACKPOT!
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Game Controls with Valley buttons */}
-      <div className="text-center">
-        {!isPlaying ? (
-          <Button
-            onClick={onStartGame}
-            disabled={!canPlay}
-            className="pixel-button border-primary text-primary-foreground pixel-font-lg px-8 py-4"
-          >
-            {canPlay ? 'PAY 0.05 GOR & PLAY' : 'CONNECT WALLET'}
-          </Button>
-        ) : (
-          <Button
-            onClick={handleStop}
-            className="pixel-button border-accent bg-accent text-accent-foreground pixel-font-lg px-8 py-4"
-          >
-            STOP!
-          </Button>
-        )}
-      </div>
-
-      {/* Instructions with valley styling */}
-      <div className="mt-6 text-center">
-        <div className="pixel-border pixel-bevel retro-card p-4">
-          <p className="pixel-font text-muted-foreground mb-2">
-            TIME YOUR TAP TO LAND IN THE GOLDEN JACKPOT ZONE!
+        {/* Simple Instructions */}
+        <div className="mt-6 text-center">
+          <p className="pixel-font text-gray-400 text-xs">
+            TIME YOUR TAP TO HIT THE ZERO ZONE
           </p>
-          <p className="pixel-font text-xs text-muted-foreground">
-            PERFECT SCORE (100) WINS THE ENTIRE PRIZE POOL INSTANTLY!
+          <p className="pixel-font text-gray-500 text-xs mt-2">
+            PERFECT SCORE = INSTANT JACKPOT
           </p>
         </div>
       </div>

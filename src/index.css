@@ -4,55 +4,31 @@
 @tailwind utilities;
 
 /* Import chunky pixel fonts */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap');
-
-/* Stardew Valley Pixel Art Design System */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 @layer base {
   :root {
-    /* Stardew Valley inspired palette from the reference image */
-    --background: 200 25% 8%;
-    --foreground: 150 40% 85%;
-
-    --card: 200 20% 12%;
-    --card-foreground: 150 40% 85%;
-
-    --popover: 200 25% 8%;
-    --popover-foreground: 150 40% 85%;
-
-    /* Forest Green - Primary (main green from cityscape) */
-    --primary: 150 60% 45%;
-    --primary-foreground: 200 25% 8%;
-
-    /* Dark Teal - Secondary */
-    --secondary: 180 30% 20%;
-    --secondary-foreground: 150 40% 85%;
-
-    --muted: 200 20% 15%;
-    --muted-foreground: 150 25% 65%;
-
-    /* Bright Teal - Accent */
-    --accent: 170 50% 55%;
-    --accent-foreground: 200 25% 8%;
-
-    /* Deep Purple - Destructive (window lights) */
-    --destructive: 260 40% 50%;
-    --destructive-foreground: 150 40% 85%;
-
-    --border: 150 40% 35%;
-    --input: 200 20% 15%;
-    --ring: 150 60% 45%;
-
+    /* Clean, modern cyber palette */
+    --background: 240 10% 5%;
+    --foreground: 0 0% 95%;
+    --card: 240 10% 8%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 150 100% 50%;
+    --primary-foreground: 240 10% 5%;
+    --secondary: 180 100% 50%;
+    --secondary-foreground: 240 10% 5%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 300 100% 70%;
+    --accent-foreground: 240 10% 5%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 240 10% 15%;
+    --input: 240 10% 10%;
+    --ring: 150 100% 50%;
     --radius: 0px;
-
-    /* Stardew Valley specific colors */
-    --valley-forest: 150 60% 45%;
-    --valley-teal: 170 50% 55%;
-    --valley-deep: 180 35% 25%;
-    --valley-purple: 260 40% 50%;
-    --valley-moss: 140 45% 40%;
-    --valley-dark: 200 25% 8%;
-    --valley-light: 150 40% 85%;
   }
 }
 
@@ -65,401 +41,141 @@
   }
 
   body {
-    @apply bg-background text-foreground min-h-screen;
-    background: 
-      radial-gradient(circle at 25% 25%, hsl(var(--valley-purple) / 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, hsl(var(--valley-teal) / 0.1) 0%, transparent 50%),
-      linear-gradient(135deg, 
-        hsl(var(--valley-dark)) 0%, 
-        hsl(var(--valley-deep)) 25%,
-        hsl(var(--valley-dark)) 50%,
-        hsl(var(--valley-deep)) 75%,
-        hsl(var(--valley-dark)) 100%
-      );
+    @apply bg-background text-foreground;
     font-family: 'Press Start 2P', monospace;
     font-size: 12px;
-    line-height: 1.8;
+    line-height: 1.6;
   }
 }
 
 @layer components {
-  /* Core Pixel Typography */
+  /* Clean pixel typography */
   .pixel-font {
     font-family: 'Press Start 2P', monospace;
     font-size: 10px;
-    line-height: 2;
-    letter-spacing: 1px;
-    text-shadow: 
-      1px 1px 0 hsl(var(--valley-dark)),
-      2px 2px 0 hsl(var(--valley-dark) / 0.5);
+    line-height: 1.8;
   }
 
   .pixel-font-lg {
     font-family: 'Press Start 2P', monospace;
-    font-size: 14px;
-    line-height: 2.2;
-    letter-spacing: 2px;
-    text-shadow: 
-      2px 2px 0 hsl(var(--valley-dark)),
-      3px 3px 0 hsl(var(--valley-dark) / 0.5);
+    font-size: 12px;
+    line-height: 2;
   }
 
   .pixel-font-xl {
     font-family: 'Press Start 2P', monospace;
-    font-size: 18px;
-    line-height: 2.5;
-    letter-spacing: 3px;
-    text-shadow: 
-      3px 3px 0 hsl(var(--valley-dark)),
-      4px 4px 0 hsl(var(--valley-dark) / 0.5);
+    font-size: 16px;
+    line-height: 2.2;
   }
 
-  /* Stardew Valley Pixel Borders & Shadows */
+  /* Clean card styling - less busy */
+  .clean-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Simple pixel borders */
   .pixel-border {
-    border: 3px solid hsl(var(--border));
-    border-radius: 0;
-    box-shadow: 
-      4px 4px 0 hsl(var(--valley-deep)),
-      6px 6px 0 hsl(var(--valley-dark) / 0.7);
-    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.2);
   }
 
-  .pixel-border::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    border: 1px solid hsl(var(--valley-light) / 0.2);
-    pointer-events: none;
-  }
-
-  .pixel-border::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    right: -3px;
-    bottom: -3px;
-    border: 1px solid hsl(var(--valley-dark) / 0.8);
-    pointer-events: none;
-  }
-
-  /* Stardew Valley Bevels */
-  .pixel-bevel {
-    position: relative;
-  }
-
-  .pixel-bevel::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 6px;
-    height: 6px;
-    background: linear-gradient(135deg, 
-      hsl(var(--valley-teal) / 0.4) 0%, 
-      transparent 50%);
-    clip-path: polygon(0 0, 100% 0, 0 100%);
-  }
-
-  .pixel-bevel::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 6px;
-    height: 6px;
-    background: linear-gradient(315deg, 
-      hsl(var(--valley-dark) / 0.8) 0%, 
-      transparent 50%);
-    clip-path: polygon(100% 100%, 0 100%, 100% 0);
-  }
-
-  /* Valley Dithering */
-  .pixel-dither {
-    background: 
-      radial-gradient(circle at 2px 2px, hsl(var(--valley-moss) / 0.1) 1px, transparent 1px),
-      radial-gradient(circle at 6px 6px, hsl(var(--valley-dark) / 0.1) 1px, transparent 1px),
-      linear-gradient(45deg, 
-        hsl(var(--card)) 0%, 
-        hsl(var(--card)) 25%,
-        hsl(var(--valley-deep) / 0.8) 50%,
-        hsl(var(--card)) 75%,
-        hsl(var(--card)) 100%
-      );
-    background-size: 8px 8px, 8px 8px, 100% 100%;
-  }
-
-  /* Stardew Valley Button Styling */
-  .pixel-button {
-    border: 3px solid;
-    border-radius: 0;
+  /* Clean button styling */
+  .pixel-pill {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
     font-family: 'Press Start 2P', monospace;
     font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 12px 24px;
-    position: relative;
-    transition: all 0.1s step-end;
-    box-shadow: 
-      4px 4px 0 hsl(var(--valley-deep)),
-      6px 6px 0 hsl(var(--valley-dark) / 0.7);
-    background: linear-gradient(135deg,
-      hsl(var(--valley-forest)) 0%,
-      hsl(var(--valley-forest)) 45%,
-      hsl(var(--valley-moss)) 50%,
-      hsl(var(--valley-forest)) 55%,
-      hsl(var(--valley-forest)) 100%
+    padding: 12px 20px;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
+
+  .pixel-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .pixel-button-primary {
+    background: linear-gradient(135deg, #ff006e, #8338ec);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    padding: 16px 32px;
+    transition: all 0.2s ease;
+  }
+
+  .pixel-button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 0, 110, 0.3);
+  }
+
+  /* Game specific styling */
+  .game-container {
+    background: rgba(0, 0, 0, 0.6);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    padding: 32px;
+  }
+
+  .jackpot-zone {
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(0, 255, 127, 0.2) 25%,
+      rgba(0, 255, 127, 0.4) 50%,
+      rgba(0, 255, 127, 0.2) 75%,
+      transparent 100%
     );
+    border: 2px solid #00ff7f;
+    box-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
   }
 
-  .pixel-button:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 
-      6px 6px 0 hsl(var(--valley-deep)),
-      8px 8px 0 hsl(var(--valley-dark) / 0.7);
+  /* Neon text effect - more subtle */
+  .neon-text {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor;
   }
 
-  .pixel-button:active {
-    transform: translate(2px, 2px);
-    box-shadow: 
-      2px 2px 0 hsl(var(--valley-deep)),
-      4px 4px 0 hsl(var(--valley-dark) / 0.7);
-  }
-
-  /* Valley Progress Bar - Grid of Tiles */
+  /* Progress tiles - cleaner look */
   .pixel-progress {
     display: grid;
     grid-template-columns: repeat(20, 1fr);
     gap: 2px;
-    height: 24px;
-    background: hsl(var(--valley-dark));
-    border: 2px solid hsl(var(--border));
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     padding: 4px;
   }
 
   .pixel-progress-tile {
-    background: hsl(var(--valley-deep));
-    border: 1px solid hsl(var(--valley-dark));
-    transition: all 0.1s step-end;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
   }
 
   .pixel-progress-tile.active {
-    background: hsl(var(--valley-forest));
-    box-shadow: 
-      0 0 4px hsl(var(--valley-forest)),
-      inset 0 0 2px hsl(var(--valley-teal));
-  }
-
-  /* Valley Neon Text Effects */
-  .neon-text {
-    text-shadow: 
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      0 0 15px currentColor,
-      1px 1px 0 hsl(var(--valley-dark)),
-      2px 2px 0 hsl(var(--valley-dark));
-    animation: valley-glow 2s ease-in-out infinite alternate;
-  }
-
-  /* Jackpot Zone with Valley Theme */
-  .jackpot-zone {
-    position: relative;
-    background: 
-      linear-gradient(90deg, 
-        transparent 0%, 
-        hsl(var(--valley-forest) / 0.1) 25%,
-        hsl(var(--valley-forest) / 0.3) 50%,
-        hsl(var(--valley-forest) / 0.1) 75%,
-        transparent 100%
-      );
-    border: 3px solid hsl(var(--valley-forest));
-    box-shadow: 
-      0 0 20px hsl(var(--valley-forest) / 0.5),
-      inset 0 0 10px hsl(var(--valley-forest) / 0.2);
-  }
-
-  .jackpot-zone::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      repeating-linear-gradient(0deg,
-        transparent 0px,
-        transparent 2px,
-        hsl(var(--valley-teal) / 0.1) 2px,
-        hsl(var(--valley-teal) / 0.1) 4px
-      );
-    animation: scan-lines 2s linear infinite;
-    pointer-events: none;
-  }
-
-  .jackpot-zone::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    right: 2px;
-    bottom: 2px;
-    background: 
-      radial-gradient(circle at 20% 50%, hsl(var(--valley-light) / 0.1) 2px, transparent 2px),
-      radial-gradient(circle at 80% 30%, hsl(var(--valley-teal) / 0.1) 1px, transparent 1px),
-      radial-gradient(circle at 60% 80%, hsl(var(--valley-light) / 0.1) 1px, transparent 1px);
-    animation: valley-sparkles 3s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  /* Game Area Styling */
-  .game-area {
-    background: 
-      linear-gradient(135deg, 
-        hsl(var(--valley-dark)) 0%,
-        hsl(var(--valley-deep)) 25%,
-        hsl(var(--valley-dark)) 50%,
-        hsl(var(--valley-deep)) 75%,
-        hsl(var(--valley-dark)) 100%
-      );
-    border: 4px solid hsl(var(--border));
-    box-shadow: 
-      6px 6px 0 hsl(var(--valley-deep)),
-      8px 8px 0 hsl(var(--valley-dark) / 0.7),
-      inset 0 0 20px hsl(var(--valley-teal) / 0.1);
-  }
-
-  /* Valley Retro Card Styling */
-  .retro-card {
-    background: 
-      linear-gradient(135deg, 
-        hsl(var(--card)) 0%, 
-        hsl(var(--valley-deep)) 50%,
-        hsl(var(--card)) 100%
-      );
-    border: 3px solid hsl(var(--border));
-    box-shadow: 
-      4px 4px 0 hsl(var(--valley-deep)),
-      6px 6px 0 hsl(var(--valley-dark) / 0.7);
-    backdrop-filter: none;
-  }
-
-  /* Valley Tab Styling */
-  .pixel-tabs {
-    border: 3px solid hsl(var(--border));
-    background: hsl(var(--valley-deep));
-    padding: 6px;
-  }
-
-  .pixel-tab {
-    border: 2px solid hsl(var(--border));
-    background: hsl(var(--valley-dark));
-    font-family: 'Press Start 2P', monospace;
-    font-size: 8px;
-    letter-spacing: 1px;
-    padding: 8px 16px;
-    transition: all 0.1s step-end;
-    box-shadow: 3px 3px 0 hsl(var(--valley-deep) / 0.7);
-  }
-
-  .pixel-tab:hover {
-    background: hsl(var(--valley-deep));
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 hsl(var(--valley-deep) / 0.7);
-  }
-
-  .pixel-tab[data-state="active"] {
-    background: hsl(var(--valley-forest));
-    color: hsl(var(--primary-foreground));
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 hsl(var(--valley-deep) / 0.7);
+    background: linear-gradient(135deg, #00ff7f, #00bcd4);
+    box-shadow: 0 0 8px rgba(0, 255, 127, 0.6);
   }
 }
 
-/* Valley Animations */
-@keyframes valley-glow {
-  0% { 
-    text-shadow: 
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      1px 1px 0 hsl(var(--valley-dark)),
-      2px 2px 0 hsl(var(--valley-dark));
-  }
-  100% { 
-    text-shadow: 
-      0 0 10px currentColor,
-      0 0 20px currentColor,
-      0 0 30px currentColor,
-      1px 1px 0 hsl(var(--valley-dark)),
-      2px 2px 0 hsl(var(--valley-dark));
-  }
+/* Simplified animations */
+@keyframes glow {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
 @keyframes scan-lines {
   0% { transform: translateY(0); }
-  100% { transform: translateY(8px); }
+  100% { transform: translateY(4px); }
 }
 
-@keyframes valley-sparkles {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.8; }
-}
-
-@keyframes cursor-sweep {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(calc(100vw + 100%)); }
-}
-
-@keyframes tile-light-up {
-  0% { 
-    background: hsl(var(--valley-deep));
-    box-shadow: none;
-  }
-  100% { 
-    background: hsl(var(--valley-forest));
-    box-shadow: 
-      0 0 4px hsl(var(--valley-forest)),
-      inset 0 0 2px hsl(var(--valley-teal));
-  }
-}
-
-/* Utility Classes */
 .pixel-art {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
-}
-
-.pixel-shadow {
-  box-shadow: 
-    3px 3px 0 hsl(var(--valley-deep)),
-    4px 4px 0 hsl(var(--valley-dark) / 0.7);
-}
-
-.pixel-shadow-lg {
-  box-shadow: 
-    4px 4px 0 hsl(var(--valley-deep)),
-    6px 6px 0 hsl(var(--valley-dark) / 0.7),
-    8px 8px 0 hsl(var(--valley-dark) / 0.5);
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--valley-dark));
-  border: 2px solid hsl(var(--border));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--valley-forest));
-  border: 2px solid hsl(var(--valley-dark));
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--valley-teal));
 }

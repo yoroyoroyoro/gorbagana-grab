@@ -203,144 +203,105 @@ const Index = () => {
     saveGameToRecent(gameEntry);
   };
 
-  return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Pixelated Background */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-15"
-        style={{
-          backgroundImage: `url('/lovable-uploads/58d1aeda-ee90-40d9-9e97-2b52f4024eae.png')`,
-          imageRendering: 'pixelated'
-        }}
-      />
-      
-      {/* Pixel Dither Overlay */}
-      <div className="fixed inset-0 pixel-dither opacity-40" />
-      
-      <div className="relative z-10 container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-7xl">
-        {/* Top Bar with Header and Navigation Tabs */}
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8">
-          {/* Header with Gorbagana Icon */}
-          <div className="flex-1">
-            <div className="flex items-center justify-center lg:justify-start gap-4 mb-4">
-              <div className="pixel-border pixel-bevel bg-card/90 p-4">
-                <img 
-                  src="/lovable-uploads/b2c25c3c-fa02-453c-ac6c-b981edeccf43.png" 
-                  alt="Gorbagana" 
-                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 pixel-art"
-                />
-              </div>
-              <div className="text-center lg:text-left">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold pixel-font-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent neon-text mb-4">
-                  GORBAGANA GRAB
-                </h1>
-                <p className="text-muted-foreground pixel-font tracking-ultra-wide mb-2">
-                  TIME YOUR TAP. WIN THE POT.
-                </p>
-                <p className="text-muted-foreground pixel-font text-xs tracking-wider">
-                  GORBAGANA TESTNET PRECISION GAMING
-                </p>
-                {isConnected && balanceLoaded && (
-                  <p className="text-accent pixel-font mt-3 tracking-wider">
-                    BALANCE: {gorBalance.toFixed(4)} GOR
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+  const formatTime = () => {
+    const hours = Math.floor(timeRemaining / 3600);
+    const minutes = Math.floor((timeRemaining % 3600) / 60);
+    const seconds = timeRemaining % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
 
-          {/* Navigation Tabs - Top Right */}
-          <div className="w-full lg:w-auto lg:min-w-[400px]">
-            <div className="pixel-tabs">
-              <div className="grid grid-cols-3 gap-3">
-                <Button asChild variant="outline" size="sm" className="pixel-tab border-primary">
-                  <Link to="/stats">
-                    <User className="w-3 h-3 mr-2 pixel-art" />
-                    <span className="pixel-font">STATS</span>
-                  </Link>
-                </Button>
-                
-                <Button asChild variant="outline" size="sm" className="pixel-tab border-accent">
-                  <Link to="/leaderboard">
-                    <Trophy className="w-3 h-3 mr-2 pixel-art" />
-                    <span className="pixel-font">LEADERS</span>
-                  </Link>
-                </Button>
-                
-                <Button asChild variant="outline" size="sm" className="pixel-tab border-secondary">
-                  <Link to="/recent">
-                    <Clock className="w-3 h-3 mr-2 pixel-art" />
-                    <span className="pixel-font">RECENT</span>
-                  </Link>
-                </Button>
-              </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-blue-900 relative overflow-hidden">
+      {/* Simple gradient background with subtle texture */}
+      <div className="fixed inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-cyan-500/10" />
+      
+      <div className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
+        {/* Header - Clean and Simple */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center items-center gap-6 mb-8">
+            <img 
+              src="/lovable-uploads/b2c25c3c-fa02-453c-ac6c-b981edeccf43.png" 
+              alt="Gorbagana" 
+              className="w-16 h-16 pixel-art"
+            />
+            <h1 className="text-4xl font-bold pixel-font-xl text-white neon-text">
+              GORBAGANA GRAB
+            </h1>
+          </div>
+          
+          {/* Navigation Pills - Top Right Style */}
+          <div className="flex justify-center gap-4 mb-8">
+            <Button asChild variant="outline" className="pixel-pill">
+              <Link to="/stats">
+                <User className="w-4 h-4 mr-2" />
+                STATS
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="pixel-pill">
+              <Link to="/leaderboard">
+                <Trophy className="w-4 h-4 mr-2" />
+                SCORES
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="pixel-pill">
+              <Link to="/recent">
+                <Clock className="w-4 h-4 mr-2" />
+                RECENT
+              </Link>
+            </Button>
           </div>
         </div>
 
-        {/* Game Header */}
-        <GameHeader
-          prizePool={prizePool}
-          timeRemaining={timeRemaining}
-          isWalletConnected={isConnected}
-          walletAddress={publicKey}
-          onConnectWallet={handleConnectWallet}
+        {/* Game Stats - Simplified */}
+        <div className="flex justify-center gap-8 mb-8">
+          <div className="clean-card text-center">
+            <div className="text-2xl font-bold text-cyan-400 pixel-font">{prizePool.toFixed(2)} GOR</div>
+            <div className="text-sm text-gray-400 pixel-font">PRIZE POOL</div>
+          </div>
+          
+          <div className="clean-card text-center">
+            <div className="text-2xl font-bold text-pink-400 pixel-font">{formatTime()}</div>
+            <div className="text-sm text-gray-400 pixel-font">TIME LEFT</div>
+          </div>
+          
+          {isConnected && (
+            <div className="clean-card text-center">
+              <div className="text-2xl font-bold text-green-400 pixel-font">{gorBalance.toFixed(2)} GOR</div>
+              <div className="text-sm text-gray-400 pixel-font">BALANCE</div>
+            </div>
+          )}
+        </div>
+
+        {/* Game Area - Clean and Focused */}
+        <GameArea
+          isPlaying={isPlaying}
+          onStop={handleGameStop}
+          onStartGame={handleStartGame}
+          canPlay={isConnected && balanceLoaded && gorBalance >= 0.05}
         />
 
-        {/* Wallet Connection Status */}
+        {/* Wallet Connection - Only show if not connected */}
         {!isConnected && (
-          <div className="text-center mb-6 p-6 retro-card pixel-border pixel-bevel mx-2 sm:mx-0">
-            <p className="text-muted-foreground mb-3 pixel-font tracking-wider">
-              CONNECT YOUR BACKPACK WALLET TO START PLAYING
-            </p>
-            <p className="text-muted-foreground pixel-font text-xs tracking-wide">
-              GORBAGANA TESTNET RPC: HTTPS://RPC.GORBAGANA.WTF/
-            </p>
+          <div className="text-center mt-8">
+            <Button 
+              onClick={handleConnectWallet}
+              className="pixel-button-primary"
+            >
+              CONNECT WALLET TO PLAY
+            </Button>
           </div>
         )}
 
-        {/* Game Area */}
-        <div className="px-2 sm:px-0 mb-8">
-          <GameArea
-            isPlaying={isPlaying}
-            onStop={handleGameStop}
-            onStartGame={handleStartGame}
-            canPlay={isConnected && balanceLoaded && gorBalance >= 0.05}
-          />
-        </div>
-
-        {/* Insufficient balance warning - only show if balance is loaded */}
+        {/* Balance Warning - Clean notification */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
-          <div className="text-center mb-6 p-6 retro-card pixel-border pixel-bevel mx-2 sm:mx-0 border-destructive">
-            <p className="text-destructive pixel-font tracking-wider">
-              INSUFFICIENT GOR BALANCE
-            </p>
-            <p className="text-destructive pixel-font text-xs mt-2">
-              YOU NEED AT LEAST 0.05 GOR TO PLAY
-            </p>
-            <p className="text-muted-foreground pixel-font text-xs mt-3 tracking-wide">
-              CURRENT BALANCE: {gorBalance.toFixed(4)} GOR
-            </p>
+          <div className="text-center mt-6">
+            <div className="clean-card border-red-500/50 bg-red-900/20">
+              <p className="text-red-400 pixel-font">
+                NEED 0.05 GOR TO PLAY
+              </p>
+            </div>
           </div>
         )}
-
-        {/* Footer */}
-        <div className="mt-12 text-center text-muted-foreground px-2 sm:px-0">
-          <div className="pixel-border pixel-bevel retro-card p-4">
-            <p className="pixel-font text-xs tracking-wider mb-2">
-              POWERED BY GORBAGANA TESTNET
-            </p>
-            <p className="pixel-font text-xs tracking-wide">
-              RPC: HTTPS://RPC.GORBAGANA.WTF/
-            </p>
-            <p className="pixel-font text-xs mt-3 tracking-wide">
-              GAME RESETS EVERY 24 HOURS OR ON INSTANT JACKPOT
-            </p>
-            <p className="pixel-font text-xs mt-1 tracking-wide">
-              PLAY RESPONSIBLY
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
