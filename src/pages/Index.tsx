@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -237,12 +238,15 @@ const Index = () => {
       
       <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-24">
-          <div className="flex justify-center items-center gap-6 mb-12">
+        <div className="text-center mb-16">
+          <div className="flex justify-center items-center gap-6 mb-8">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 
               className="w-auto h-96 pixel-art"
+              style={{
+                filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
+              }}
             />
           </div>
         </div>
