@@ -118,7 +118,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
               disabled={!canPlay}
               className={canPlay ? "pixel-button-primary" : "pixel-pill opacity-50"}
             >
-              {canPlay ? 'PAY 0.05 GOR & PLAY' : 'CONNECT WALLET'}
+              {canPlay ? 'PAY 0.05 GOR & PLAY' : 'NEED WALLET & GOR'}
             </Button>
           ) : (
             <Button
