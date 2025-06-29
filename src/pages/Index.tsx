@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import GameHeader from '@/components/GameHeader';
 import GameArea from '@/components/GameArea';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
 import { gorConnection } from '@/utils/gorConnection';
+import { JackpotSystem } from '@/utils/jackpotSystem';
 import { PublicKey } from '@solana/web3.js';
 import { User, Trophy, Clock, Wallet, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -47,18 +49,43 @@ const Index = () => {
     winRate: 0
   });
 
-  // Timer countdown
+  // Initialize or get current round
+  useEffect(() => {
+    let round = JackpotSystem.getCurrentRound();
+    if (!round) {
+      round = JackpotSystem.initializeRound(0);
+    }
+    setPrizePool(round.prizePool);
+    setTimeRemaining(JackpotSystem.getTimeRemaining(round));
+  }, []);
+
+  // Timer countdown and round management
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeRemaining(prev => {
-        if (prev <= 1) {
-          toast.success('Round ended! New round starting...');
-          setPrizePool(0);
-          localStorage.removeItem('recentGames');
-          return 86400;
+      const round = JackpotSystem.getCurrentRound();
+      if (!round) return;
+
+      const remaining = JackpotSystem.getTimeRemaining(round);
+      setTimeRemaining(remaining);
+
+      if (remaining <= 0) {
+        // Check and end expired round
+        const result = JackpotSystem.checkAndEndExpiredRound();
+        if (result.roundEnded) {
+          if (result.winner) {
+            toast.success(
+              `Round ended! ${result.winner.player.slice(0, 6)}...${result.winner.player.slice(-4)} won ${result.winner.prize.toFixed(2)} GOR with score ${result.winner.score}!`
+            );
+          } else {
+            toast.success('Round ended! No games were played.');
+          }
+          
+          // Reset for new round
+          const newRound = JackpotSystem.initializeRound(0);
+          setPrizePool(newRound.prizePool);
+          setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
         }
-        return prev - 1;
-      });
+      }
     }, 1000);
 
     return () => clearInterval(timer);
@@ -112,12 +139,6 @@ const Index = () => {
     setPlayerStats(stats);
   };
 
-  const saveGameToRecent = (gameEntry: GameEntry) => {
-    const existingGames = JSON.parse(localStorage.getItem('recentGames') || '[]');
-    const updatedGames = [gameEntry, ...existingGames.slice(0, 9)];
-    localStorage.setItem('recentGames', JSON.stringify(updatedGames));
-  };
-
   const handleConnectWallet = async () => {
     await connectWallet();
   };
@@ -145,7 +166,6 @@ const Index = () => {
 
       toast.success('Payment of 0.05 GOR processed! Game starting...');
       
-      setPrizePool(prev => prev + 0.05);
       setIsPlaying(true);
       setCurrentScore(null);
       
@@ -174,21 +194,25 @@ const Index = () => {
       prize: 0
     };
 
-    if (score === 100) {
-      gameEntry.prize = prizePool;
-      toast.success(`INSTANT JACKPOT! You won ${prizePool.toFixed(2)} GOR!`);
+    // Add game to jackpot system
+    const updatedRound = JackpotSystem.addGameToRound(gameEntry, 0.05);
+    setPrizePool(updatedRound.prizePool);
+
+    // Check if this game won something
+    const winnerGame = updatedRound.games.find(g => g.id === gameEntry.id);
+    if (winnerGame && winnerGame.prize > 0) {
+      toast.success(`INSTANT JACKPOT! You won ${winnerGame.prize.toFixed(2)} GOR!`);
       
       const updatedStats = {
         ...playerStats,
-        totalWinnings: playerStats.totalWinnings + prizePool,
+        totalWinnings: playerStats.totalWinnings + winnerGame.prize,
         bestScore: Math.max(playerStats.bestScore, score),
         winRate: ((playerStats.gamesPlayed * playerStats.winRate / 100) + 1) / (playerStats.gamesPlayed) * 100
       };
       savePlayerStats(updatedStats);
       
-      setPrizePool(0);
+      // Reset timer for new round
       setTimeRemaining(86400);
-      localStorage.removeItem('recentGames');
     } else {
       const updatedStats = {
         ...playerStats,
@@ -198,8 +222,6 @@ const Index = () => {
       
       toast.success(`Score: ${score}! ${score >= 90 ? 'Excellent!' : score >= 70 ? 'Great!' : 'Keep trying!'}`);
     }
-
-    saveGameToRecent(gameEntry);
   };
 
   const formatTime = () => {
@@ -261,8 +283,8 @@ const Index = () => {
       
       <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-6">
-          <div className="flex justify-center items-center gap-6 mb-4">
+        <div className="text-center mb-4">
+          <div className="flex justify-center items-center gap-6 mb-2">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 
@@ -274,7 +296,7 @@ const Index = () => {
           </div>
 
           {/* Game Stats - Moved closer to header */}
-          <div className="flex justify-center gap-12 mb-8">
+          <div className="flex justify-center gap-12 mb-6">
             <div className="clean-card text-center">
               <div className="text-2xl font-bold text-teal-300 pixel-font">{prizePool.toFixed(2)} GOR</div>
               <div className="text-sm text-teal-500 pixel-font">PRIZE POOL</div>
@@ -314,6 +336,19 @@ const Index = () => {
             </div>
           </div>
         )}
+
+        {/* Round System Info */}
+        <div className="text-center mt-8">
+          <div className="clean-card bg-gradient-to-r from-purple-900/30 to-blue-900/30 border-purple-400/40">
+            <h3 className="text-purple-300 pixel-font text-lg mb-2">ROUND SYSTEM</h3>
+            <div className="text-sm text-purple-200 pixel-font space-y-1">
+              <p>• Perfect hit (100) = Instant jackpot win</p>
+              <p>• Round ends after 24 hours</p>
+              <p>• Highest scorer wins the prize pool</p>
+              <p>• First to achieve highest score wins ties</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

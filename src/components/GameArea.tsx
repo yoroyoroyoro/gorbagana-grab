@@ -21,8 +21,8 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
       const startTime = Date.now();
       
       intervalRef.current = setInterval(() => {
-        const elapsed = (Date.now() - startTime) % 2000; // 2 second cycle (faster)
-        const progress = elapsed / 2000;
+        const elapsed = (Date.now() - startTime) % 1000; // 1 second cycle (faster)
+        const progress = elapsed / 1000;
         
         // Create back and forth motion
         let position;
