@@ -336,19 +336,6 @@ const Index = () => {
             </div>
           </div>
         )}
-
-        {/* Round System Info */}
-        <div className="text-center mt-8">
-          <div className="clean-card bg-gradient-to-r from-purple-900/30 to-blue-900/30 border-purple-400/40">
-            <h3 className="text-purple-300 pixel-font text-lg mb-2">ROUND SYSTEM</h3>
-            <div className="text-sm text-purple-200 pixel-font space-y-1">
-              <p>• Perfect hit (100) = Instant jackpot win</p>
-              <p>• Round ends after 24 hours</p>
-              <p>• Highest scorer wins the prize pool</p>
-              <p>• First to achieve highest score wins ties</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Help Icon - Bottom Right */}
@@ -357,27 +344,30 @@ const Index = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="relative cursor-pointer group">
-                {/* Animated "Click Me" Text */}
-                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 text-teal-300 pixel-font text-sm animate-bounce whitespace-nowrap">
+                {/* Animated "Click Me" Text - Positioned directly above */}
+                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-teal-300 pixel-font text-sm animate-bounce whitespace-nowrap">
                   CLICK ME
                 </div>
                 
-                {/* Help Icon */}
-                <div className="w-20 h-20 hover:scale-110 transition-transform duration-200">
+                {/* Help Icon - Made bigger with glow effect */}
+                <div className="w-32 h-32 hover:scale-110 transition-transform duration-200">
                   <img 
                     src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
                     alt="Help Character" 
-                    className="w-full h-full pixel-art hover:drop-shadow-[0_0_20px_rgba(32,178,170,0.8)]"
+                    className="w-full h-full pixel-art"
+                    style={{
+                      filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
+                    }}
                   />
                 </div>
               </div>
             </TooltipTrigger>
             <TooltipContent 
               side="left" 
-              className="max-w-sm p-4 bg-gradient-to-r from-purple-900/95 to-blue-900/95 border-purple-400/40 text-purple-100"
+              className="max-w-sm p-6 bg-gradient-to-r from-purple-900/95 to-blue-900/95 border-purple-400/40 text-purple-100"
             >
-              <h3 className="pixel-font text-lg mb-3 text-purple-300">ROUND SYSTEM GUIDE</h3>
-              <div className="pixel-font text-sm space-y-2">
+              <h3 className="pixel-font text-lg mb-4 text-purple-300">ROUND SYSTEM GUIDE</h3>
+              <div className="pixel-font text-sm space-y-3">
                 <div className="flex items-start gap-2">
                   <span className="text-teal-300">•</span>
                   <span>Perfect hit (100 score) = Instant jackpot win!</span>
@@ -397,6 +387,11 @@ const Index = () => {
                 <div className="flex items-start gap-2">
                   <span className="text-pink-300">•</span>
                   <span>0.05 GOR per game adds to the prize pool</span>
+                </div>
+                <div className="mt-4 pt-3 border-t border-purple-400/30">
+                  <div className="text-purple-300 pixel-font text-xs">
+                    Pay 0.05 GOR to play • Hit the trash perfectly • Win big!
+                  </div>
                 </div>
               </div>
             </TooltipContent>
