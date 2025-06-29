@@ -236,14 +236,23 @@ const Index = () => {
               RECENT
             </Link>
           </Button>
-          {isConnected && publicKey && (
+          {!isConnected ? (
+            <Button 
+              onClick={handleConnectWallet}
+              variant="outline" 
+              className="pixel-pill text-teal-400 border-teal-400/40 hover:bg-teal-400/10"
+            >
+              <Wallet className="w-4 h-4 mr-2" />
+              CONNECT
+            </Button>
+          ) : (
             <Button 
               onClick={handleDisconnectWallet}
               variant="outline" 
               className="pixel-pill text-red-400 border-red-400/40 hover:bg-red-400/10"
             >
               <Wallet className="w-4 h-4 mr-2" />
-              {publicKey.slice(0, 4)}...{publicKey.slice(-4)}
+              {publicKey!.slice(0, 4)}...{publicKey!.slice(-4)}
               <LogOut className="w-4 h-4 ml-2" />
             </Button>
           )}
@@ -252,8 +261,8 @@ const Index = () => {
       
       <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center items-center gap-6 mb-6">
+        <div className="text-center mb-4">
+          <div className="flex justify-center items-center gap-6 mb-4">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 
@@ -266,7 +275,7 @@ const Index = () => {
         </div>
 
         {/* Game Stats */}
-        <div className="flex justify-center gap-12 mb-8">
+        <div className="flex justify-center gap-12 mb-4">
           <div className="clean-card text-center">
             <div className="text-2xl font-bold text-teal-300 pixel-font">{prizePool.toFixed(2)} GOR</div>
             <div className="text-sm text-teal-500 pixel-font">PRIZE POOL</div>
@@ -286,7 +295,7 @@ const Index = () => {
         </div>
 
         {/* Game Area */}
-        <div className="mb-8">
+        <div className="mb-4">
           <GameArea
             isPlaying={isPlaying}
             onStop={handleGameStop}
@@ -294,18 +303,6 @@ const Index = () => {
             canPlay={isConnected && balanceLoaded && gorBalance >= 0.05}
           />
         </div>
-
-        {/* Wallet Connection - Only show if not connected */}
-        {!isConnected && (
-          <div className="text-center mt-8">
-            <Button 
-              onClick={handleConnectWallet}
-              className="pixel-button-primary"
-            >
-              CONNECT WALLET TO PLAY
-            </Button>
-          </div>
-        )}
 
         {/* Balance Warning */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
