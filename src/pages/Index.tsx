@@ -5,14 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GameHeader from '@/components/GameHeader';
 import GameArea from '@/components/GameArea';
-import Navigation from '@/components/Navigation';
-import PlayerStats from '@/components/PlayerStats';
-import Leaderboard from '@/components/Leaderboard';
-import RecentGames from '@/components/RecentGames';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
 import { gorConnection } from '@/utils/gorConnection';
 import { PublicKey } from '@solana/web3.js';
 import { User, Trophy, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Mock data types
 interface PlayerData {
@@ -29,13 +26,6 @@ interface GameEntry {
   score: number;
   timestamp: Date;
   prize: number;
-}
-
-interface LeaderboardEntry {
-  rank: number;
-  address: string;
-  totalWinnings: number;
-  gamesWon: number;
 }
 
 const Index = () => {
@@ -57,16 +47,6 @@ const Index = () => {
     bestScore: 0,
     winRate: 0
   });
-
-  // Mock data for tabs
-  const [recentGames, setRecentGames] = useState<GameEntry[]>([]);
-  const [leaderboard] = useState<LeaderboardEntry[]>([
-    { rank: 1, address: '8K7qX2vN9mB3pL4wR5tY6uI7oP8aS9dF', totalWinnings: 23.45, gamesWon: 12 },
-    { rank: 2, address: '9M4tE6rY8uI3oP2aS7dF5gH1jK9lZ3xC', totalWinnings: 18.92, gamesWon: 8 },
-    { rank: 3, address: '7B2nV5mK9lP4wR8tY3uI6oS1aD4fG7hJ', totalWinnings: 15.67, gamesWon: 6 },
-    { rank: 4, address: '6C8vB4nM2kL9pW5rT7yU1iO3sA6dF9gH', totalWinnings: 12.34, gamesWon: 4 },
-    { rank: 5, address: '5F3gH7jK1lZ9xC2vB8nM4kP6wR5tY9uI', totalWinnings: 9.81, gamesWon: 3 }
-  ]);
 
   // Timer countdown
   useEffect(() => {
@@ -90,7 +70,6 @@ const Index = () => {
     if (isConnected && publicKey) {
       checkGorBalance();
       loadPlayerStats();
-      loadRecentGames();
     }
   }, [isConnected, publicKey]);
 
@@ -123,18 +102,6 @@ const Index = () => {
     }
   };
 
-  const loadRecentGames = () => {
-    const savedGames = localStorage.getItem('recentGames');
-    if (savedGames) {
-      const games = JSON.parse(savedGames);
-      const gamesWithDates = games.map((game: any) => ({
-        ...game,
-        timestamp: new Date(game.timestamp)
-      }));
-      setRecentGames(gamesWithDates);
-    }
-  };
-
   const savePlayerStats = (stats: PlayerData) => {
     if (!publicKey) return;
     localStorage.setItem(`playerStats_${publicKey}`, JSON.stringify(stats));
@@ -145,7 +112,6 @@ const Index = () => {
     const existingGames = JSON.parse(localStorage.getItem('recentGames') || '[]');
     const updatedGames = [gameEntry, ...existingGames.slice(0, 9)];
     localStorage.setItem('recentGames', JSON.stringify(updatedGames));
-    setRecentGames(updatedGames);
   };
 
   const handleConnectWallet = async () => {
@@ -247,7 +213,7 @@ const Index = () => {
       <div className="fixed inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/80" />
       
       <div className="relative z-10 container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-7xl">
-        {/* Top Bar with Header and Tabs */}
+        {/* Top Bar with Header and Navigation Tabs */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8">
           {/* Header with Gorbagana Icon */}
           <div className="flex-1">
@@ -273,53 +239,32 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Tabs Section */}
+          {/* Navigation Tabs - Top Right */}
           <div className="w-full lg:w-auto lg:min-w-[400px]">
-            <Tabs defaultValue="stats" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 pixel-border bg-card/80 backdrop-blur-sm">
-                <TabsTrigger value="stats" className="pixel-font text-xs">
+            <div className="grid grid-cols-3 gap-2">
+              <Button asChild variant="outline" size="sm" className="pixel-button border-primary">
+                <Link to="/stats">
                   <User className="w-3 h-3 mr-1 pixel-art" />
-                  STATS
-                </TabsTrigger>
-                <TabsTrigger value="leaderboard" className="pixel-font text-xs">
+                  <span className="pixel-font text-xs">STATS</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" size="sm" className="pixel-button border-accent">
+                <Link to="/leaderboard">
                   <Trophy className="w-3 h-3 mr-1 pixel-art" />
-                  LEADERS
-                </TabsTrigger>
-                <TabsTrigger value="recent" className="pixel-font text-xs">
+                  <span className="pixel-font text-xs">LEADERS</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" size="sm" className="pixel-button border-secondary">
+                <Link to="/recent">
                   <Clock className="w-3 h-3 mr-1 pixel-art" />
-                  RECENT
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="stats" className="mt-4">
-                <div className="pixel-border bg-card/80 backdrop-blur-sm p-4 max-h-80 overflow-y-auto">
-                  <PlayerStats
-                    walletAddress={publicKey}
-                    totalWinnings={playerStats.totalWinnings}
-                    gamesPlayed={playerStats.gamesPlayed}
-                    bestScore={playerStats.bestScore}
-                    winRate={playerStats.winRate}
-                  />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="leaderboard" className="mt-4">
-                <div className="pixel-border bg-card/80 backdrop-blur-sm p-4 max-h-80 overflow-y-auto">
-                  <Leaderboard players={leaderboard} />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="recent" className="mt-4">
-                <div className="pixel-border bg-card/80 backdrop-blur-sm p-4 max-h-80 overflow-y-auto">
-                  <RecentGames games={recentGames} />
-                </div>
-              </TabsContent>
-            </Tabs>
+                  <span className="pixel-font text-xs">RECENT</span>
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
-
-        {/* Navigation */}
-        <Navigation />
 
         {/* Game Header */}
         <GameHeader
