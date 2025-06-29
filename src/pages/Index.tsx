@@ -261,8 +261,8 @@ const Index = () => {
       
       <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-4">
-          <div className="flex justify-center items-center gap-6 mb-4">
+        <div className="text-center mb-6">
+          <div className="flex justify-center items-center gap-6 mb-6">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 
@@ -272,26 +272,26 @@ const Index = () => {
               }}
             />
           </div>
-        </div>
 
-        {/* Game Stats */}
-        <div className="flex justify-center gap-12 mb-4">
-          <div className="clean-card text-center">
-            <div className="text-2xl font-bold text-teal-300 pixel-font">{prizePool.toFixed(2)} GOR</div>
-            <div className="text-sm text-teal-500 pixel-font">PRIZE POOL</div>
-          </div>
-          
-          <div className="clean-card text-center">
-            <div className="text-2xl font-bold text-emerald-300 pixel-font">{formatTime()}</div>
-            <div className="text-sm text-emerald-500 pixel-font">TIME LEFT</div>
-          </div>
-          
-          {isConnected && (
+          {/* Game Stats - Moved closer to header */}
+          <div className="flex justify-center gap-12 mb-8">
             <div className="clean-card text-center">
-              <div className="text-2xl font-bold text-cyan-300 pixel-font">{gorBalance.toFixed(2)} GOR</div>
-              <div className="text-sm text-cyan-500 pixel-font">BALANCE</div>
+              <div className="text-2xl font-bold text-teal-300 pixel-font">{prizePool.toFixed(2)} GOR</div>
+              <div className="text-sm text-teal-500 pixel-font">PRIZE POOL</div>
             </div>
-          )}
+            
+            <div className="clean-card text-center">
+              <div className="text-2xl font-bold text-emerald-300 pixel-font">{formatTime()}</div>
+              <div className="text-sm text-emerald-500 pixel-font">TIME LEFT</div>
+            </div>
+            
+            {isConnected && (
+              <div className="clean-card text-center">
+                <div className="text-2xl font-bold text-cyan-300 pixel-font">{gorBalance.toFixed(2)} GOR</div>
+                <div className="text-sm text-cyan-500 pixel-font">BALANCE</div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Game Area */}

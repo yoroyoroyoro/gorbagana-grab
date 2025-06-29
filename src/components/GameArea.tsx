@@ -71,9 +71,11 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
               width: '10%'
             }}
           >
-            <span className="pixel-font text-teal-200 neon-text text-xs">
-              ZERO
-            </span>
+            <img 
+              src="/lovable-uploads/fbd6adb9-0fb4-45b6-871c-3bd58a13d21f.png" 
+              alt="Trash Target" 
+              className="w-12 h-12 pixel-art"
+            />
           </div>
 
           {/* Moving Pixel Character Cursor */}
@@ -125,7 +127,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
               onClick={handleStop}
               className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-4 px-8 pixel-font border-2 border-red-400/60"
             >
-              STOP AT ZERO!
+              HIT THE TRASH!
             </Button>
           )}
         </div>
@@ -133,10 +135,10 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         {/* Instructions */}
         <div className="mt-6 text-center">
           <p className="pixel-font text-teal-400 text-xs">
-            TIME YOUR TAP TO HIT THE ZERO ZONE
+            TIME YOUR TAP TO HIT THE TRASH CAN
           </p>
           <p className="pixel-font text-teal-500 text-xs mt-2">
-            PERFECT SCORE = INSTANT JACKPOT
+            PERFECT HIT = INSTANT JACKPOT
           </p>
         </div>
       </div>
