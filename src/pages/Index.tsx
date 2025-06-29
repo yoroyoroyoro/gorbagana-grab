@@ -262,7 +262,7 @@ const Index = () => {
       <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="flex justify-center items-center gap-6 mb-6">
+          <div className="flex justify-center items-center gap-6 mb-4">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 

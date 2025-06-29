@@ -65,7 +65,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         <div className="relative h-24 mb-6 bg-gradient-to-r from-teal-900/70 via-emerald-900/70 to-cyan-900/70 border-2 border-teal-400/40 overflow-hidden">
           {/* Jackpot Zone */}
           <div 
-            className="absolute top-4 h-16 jackpot-zone flex items-center justify-center"
+            className="absolute top-4 h-16 jackpot-zone flex items-center justify-center border-2 border-yellow-400 rounded-lg bg-yellow-400/10"
             style={{ 
               left: '45%', 
               width: '10%'
