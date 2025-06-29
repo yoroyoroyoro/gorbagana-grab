@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -241,13 +240,10 @@ const Index = () => {
         <div className="text-center mb-12">
           <div className="flex justify-center items-center gap-6 mb-8">
             <img 
-              src="/lovable-uploads/b2c25c3c-fa02-453c-ac6c-b981edeccf43.png" 
-              alt="Gorbagana" 
-              className="w-16 h-16 pixel-art"
+              src="/lovable-uploads/b22955f3-76d1-4808-bce9-4abc0ec60b85.png" 
+              alt="Gorbagana Grab" 
+              className="w-auto h-24 pixel-art"
             />
-            <h1 className="text-4xl font-bold pixel-font-xl text-teal-300 neon-text">
-              GORBAGANA GRAB
-            </h1>
           </div>
         </div>
 
