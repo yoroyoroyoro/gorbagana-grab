@@ -45,33 +45,33 @@ const PlayerStats = ({
           <div className="text-center p-3 bg-background/50 rounded-lg">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Coins className="w-4 h-4 text-accent" />
-              <span className="text-sm text-muted-foreground">Total Winnings</span>
             </div>
             <div className="text-lg font-bold text-accent">
               {totalWinnings.toFixed(2)} GOR
             </div>
+            <div className="text-xs text-muted-foreground">Total Winnings</div>
           </div>
           
           <div className="text-center p-3 bg-background/50 rounded-lg">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Trophy className="w-4 h-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Best Score</span>
             </div>
             <div className="text-lg font-bold text-primary">
               {bestScore}
             </div>
+            <div className="text-xs text-muted-foreground">Best Score</div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="text-center p-3 bg-background/50 rounded-lg">
-            <div className="text-sm text-muted-foreground mb-1">Games Played</div>
             <div className="text-lg font-bold">{gamesPlayed}</div>
+            <div className="text-xs text-muted-foreground">Games Played</div>
           </div>
           
           <div className="text-center p-3 bg-background/50 rounded-lg">
-            <div className="text-sm text-muted-foreground mb-1">Win Rate</div>
             <div className="text-lg font-bold">{winRate.toFixed(1)}%</div>
+            <div className="text-xs text-muted-foreground">Win Rate</div>
           </div>
         </div>
       </CardContent>

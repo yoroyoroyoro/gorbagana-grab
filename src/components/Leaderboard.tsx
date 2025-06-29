@@ -34,7 +34,7 @@ const Leaderboard = ({ players }: LeaderboardProps) => {
       <CardContent>
         {players.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
-            No players yet. Be the first to play!
+            No winners yet. Be the first to hit the jackpot!
           </div>
         ) : (
           <div className="space-y-2">
@@ -52,7 +52,7 @@ const Leaderboard = ({ players }: LeaderboardProps) => {
                       {player.address.slice(0, 6)}...{player.address.slice(-4)}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {player.gamesWon} wins
+                      {player.gamesWon} jackpot{player.gamesWon !== 1 ? 's' : ''}
                     </div>
                   </div>
                 </div>

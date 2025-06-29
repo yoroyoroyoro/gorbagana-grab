@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,13 +13,40 @@ interface LeaderboardEntry {
 }
 
 const GlobalLeaderboardPage = () => {
-  const [leaderboard] = useState<LeaderboardEntry[]>([
-    { rank: 1, address: '8K7qX2vN9mB3pL4wR5tY6uI7oP8aS9dF', totalWinnings: 23.45, gamesWon: 12 },
-    { rank: 2, address: '9M4tE6rY8uI3oP2aS7dF5gH1jK9lZ3xC', totalWinnings: 18.92, gamesWon: 8 },
-    { rank: 3, address: '7B2nV5mK9lP4wR8tY3uI6oS1aD4fG7hJ', totalWinnings: 15.67, gamesWon: 6 },
-    { rank: 4, address: '6C8vB4nM2kL9pW5rT7yU1iO3sA6dF9gH', totalWinnings: 12.34, gamesWon: 4 },
-    { rank: 5, address: '5F3gH7jK1lZ9xC2vB8nM4kP6wR5tY9uI', totalWinnings: 9.81, gamesWon: 3 }
-  ]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+
+  useEffect(() => {
+    // Get all player stats from localStorage and create leaderboard
+    const allStats: LeaderboardEntry[] = [];
+    
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('playerStats_')) {
+        const stats = JSON.parse(localStorage.getItem(key) || '{}');
+        const address = key.replace('playerStats_', '');
+        
+        // Only include players with actual winnings
+        if (stats.totalWinnings > 0) {
+          allStats.push({
+            rank: 0, // Will be set after sorting
+            address,
+            totalWinnings: stats.totalWinnings,
+            gamesWon: stats.totalWinnings > 0 ? 1 : 0 // Count games with winnings
+          });
+        }
+      }
+    }
+
+    // Sort by total winnings and assign ranks
+    const sortedStats = allStats
+      .sort((a, b) => b.totalWinnings - a.totalWinnings)
+      .map((entry, index) => ({
+        ...entry,
+        rank: index + 1
+      }));
+
+    setLeaderboard(sortedStats);
+  }, []);
 
   return (
     <div className="page-container">

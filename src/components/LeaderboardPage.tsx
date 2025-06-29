@@ -14,8 +14,7 @@ interface LeaderboardPageProps {
 
 const LeaderboardPage = ({ players }: LeaderboardPageProps) => {
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h2 className="text-2xl font-bold mb-6">Global Leaderboard</h2>
+    <div>
       <Leaderboard players={players} />
     </div>
   );
