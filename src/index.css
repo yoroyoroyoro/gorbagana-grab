@@ -38,6 +38,7 @@
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    cursor: url('/lovable-uploads/ba2e939e-10ea-4a3f-84ad-76e3dc1d28e7.png') 16 16, auto;
   }
 
   body {
@@ -50,6 +51,7 @@
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
+    cursor: url('/lovable-uploads/ba2e939e-10ea-4a3f-84ad-76e3dc1d28e7.png') 16 16, auto;
   }
 
   body::before {
@@ -62,6 +64,11 @@
     background: rgba(16, 25, 35, 0.7);
     backdrop-filter: blur(1px);
     z-index: -1;
+  }
+
+  /* Custom cursor for interactive elements */
+  button, a, [role="button"] {
+    cursor: url('/lovable-uploads/ba2e939e-10ea-4a3f-84ad-76e3dc1d28e7.png') 16 16, pointer;
   }
 }
 
