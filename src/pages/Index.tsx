@@ -210,19 +210,38 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-7xl">
-        {/* Header */}
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Pixelated Background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+        style={{
+          backgroundImage: `url('/lovable-uploads/58d1aeda-ee90-40d9-9e97-2b52f4024eae.png')`,
+          imageRendering: 'pixelated'
+        }}
+      />
+      
+      {/* Overlay for better readability */}
+      <div className="fixed inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/80" />
+      
+      <div className="relative z-10 container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-7xl">
+        {/* Header with Gorbagana Icon */}
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent neon-text mb-2">
-            GORBAGANA GRAB
-          </h1>
-          <p className="text-muted-foreground text-sm sm:text-lg px-2">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img 
+              src="/lovable-uploads/b2c25c3c-fa02-453c-ac6c-b981edeccf43.png" 
+              alt="Gorbagana" 
+              className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 pixel-art"
+            />
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold pixel-font bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent neon-text">
+              GORBAGANA GRAB
+            </h1>
+          </div>
+          <p className="text-muted-foreground text-sm sm:text-lg px-2 pixel-font">
             Time your tap. Win the pot. Gorbagana testnet precision gaming.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 mt-4">
             {isConnected && (
-              <p className="text-xs sm:text-sm text-accent">
+              <p className="text-xs sm:text-sm text-accent pixel-font">
                 Balance: {gorBalance.toFixed(4)} GOR
               </p>
             )}
@@ -243,11 +262,11 @@ const Index = () => {
 
         {/* Wallet Connection Status */}
         {!isConnected && (
-          <div className="text-center mb-6 p-4 bg-card/50 border border-border rounded-lg mx-2 sm:mx-0">
-            <p className="text-muted-foreground mb-2 text-sm sm:text-base">
+          <div className="text-center mb-6 p-4 bg-card/80 backdrop-blur-sm border border-border rounded-lg mx-2 sm:mx-0 pixel-border">
+            <p className="text-muted-foreground mb-2 text-sm sm:text-base pixel-font">
               Connect your Backpack wallet to start playing
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground pixel-font">
               Make sure you're connected to the Gorbagana testnet (RPC: https://rpc.gorbagana.wtf/)
             </p>
           </div>
@@ -265,11 +284,11 @@ const Index = () => {
 
         {/* Insufficient balance warning */}
         {isConnected && gorBalance < 0.05 && (
-          <div className="text-center mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg mx-2 sm:mx-0">
-            <p className="text-destructive text-sm sm:text-base">
+          <div className="text-center mb-6 p-4 bg-destructive/20 backdrop-blur-sm border border-destructive/40 rounded-lg mx-2 sm:mx-0 pixel-border">
+            <p className="text-destructive text-sm sm:text-base pixel-font">
               Insufficient GOR balance. You need at least 0.05 GOR to play.
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 pixel-font">
               Current balance: {gorBalance.toFixed(4)} GOR
             </p>
           </div>
@@ -277,10 +296,10 @@ const Index = () => {
 
         {/* Footer */}
         <div className="mt-8 sm:mt-12 text-center text-muted-foreground px-2 sm:px-0">
-          <p className="text-xs sm:text-sm">
+          <p className="text-xs sm:text-sm pixel-font">
             Powered by Gorbagana Testnet • RPC: https://rpc.gorbagana.wtf/
           </p>
-          <p className="text-xs mt-2">
+          <p className="text-xs mt-2 pixel-font">
             Game resets every 24 hours or on instant jackpot. Play responsibly.
           </p>
         </div>

@@ -3,44 +3,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import a pixelated font */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 /* Game-specific design system with crypto gaming aesthetics */
 
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --foreground: 120 40% 85%;
 
-    --card: 217.2 32.6% 17.5%;
-    --card-foreground: 210 40% 98%;
+    --card: 195 100% 8%;
+    --card-foreground: 120 40% 85%;
 
     --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover-foreground: 120 40% 85%;
 
-    --primary: 200 100% 50%;
+    --primary: 180 100% 50%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 195 100% 15%;
+    --secondary-foreground: 120 40% 85%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 195 100% 15%;
+    --muted-foreground: 140 20% 60%;
 
-    --accent: 45 100% 60%;
+    --accent: 120 60% 50%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 120 40% 85%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 200 100% 50%;
+    --border: 180 50% 25%;
+    --input: 195 100% 15%;
+    --ring: 180 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0px;
 
-    /* Game specific colors */
-    --jackpot-zone: 45 100% 60%;
-    --cursor-color: 200 100% 70%;
-    --danger-zone: 0 84.2% 60.2%;
+    /* Game specific colors - Gorbagana palette */
+    --jackpot-zone: 120 60% 50%;
+    --cursor-color: 180 100% 70%;
+    --danger-zone: 280 60% 50%;
+    --gorbagana-green: 120 60% 45%;
+    --gorbagana-blue: 200 80% 40%;
+    --gorbagana-purple: 280 60% 50%;
   }
 }
 
@@ -51,21 +57,89 @@
 
   body {
     @apply bg-background text-foreground min-h-screen;
-    background: linear-gradient(135deg, hsl(222.2 84% 4.9%) 0%, hsl(217.2 32.6% 17.5%) 100%);
+    background: linear-gradient(135deg, hsl(222.2 84% 4.9%) 0%, hsl(195 100% 8%) 50%, hsl(180 50% 10%) 100%);
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
   }
 }
 
 @layer components {
+  .pixel-font {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8em;
+    line-height: 1.6;
+    letter-spacing: 0.05em;
+  }
+
+  .pixel-art {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+
+  .pixel-border {
+    border-radius: 0;
+    border-width: 2px;
+    border-style: solid;
+    box-shadow: 
+      2px 2px 0 hsl(var(--border)),
+      4px 4px 0 hsl(var(--border) / 0.5);
+  }
+
   .game-glow {
-    box-shadow: 0 0 20px rgba(0, 188, 255, 0.3);
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.3),
+      inset 0 0 20px rgba(0, 255, 255, 0.1);
+    border: 2px solid hsl(var(--primary));
   }
   
   .jackpot-glow {
-    box-shadow: 0 0 30px rgba(255, 193, 7, 0.5);
+    box-shadow: 
+      0 0 30px rgba(0, 255, 128, 0.5),
+      inset 0 0 20px rgba(0, 255, 128, 0.2);
+    border: 2px solid hsl(var(--accent));
   }
   
   .neon-text {
-    text-shadow: 0 0 10px currentColor;
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor;
+  }
+
+  .pixel-button {
+    border-radius: 0;
+    border: 2px solid;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7em;
+    text-transform: uppercase;
+    transition: all 0.1s ease;
+    box-shadow: 
+      2px 2px 0 rgba(0, 0, 0, 0.3),
+      4px 4px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .pixel-button:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 
+      3px 3px 0 rgba(0, 0, 0, 0.3),
+      5px 5px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .pixel-button:active {
+    transform: translate(1px, 1px);
+    box-shadow: 
+      1px 1px 0 rgba(0, 0, 0, 0.3),
+      2px 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .gorbagana-gradient {
+    background: linear-gradient(45deg, 
+      hsl(var(--gorbagana-green)), 
+      hsl(var(--gorbagana-blue)), 
+      hsl(var(--gorbagana-purple))
+    );
   }
 }
 
@@ -75,8 +149,21 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(0, 188, 255, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(0, 188, 255, 0.6); }
+  0%, 100% { 
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.3),
+      inset 0 0 20px rgba(0, 255, 255, 0.1);
+  }
+  50% { 
+    box-shadow: 
+      0 0 40px rgba(0, 255, 255, 0.6),
+      inset 0 0 30px rgba(0, 255, 255, 0.2);
+  }
+}
+
+@keyframes pixel-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 .cursor-sweep {
@@ -85,4 +172,8 @@
 
 .pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.pixel-flicker {
+  animation: pixel-flicker 2s ease-in-out infinite;
 }
