@@ -17,12 +17,9 @@ const RecentGamesPageRoute = () => {
   const [recentGames, setRecentGames] = useState<GameEntry[]>([]);
 
   useEffect(() => {
-    // In a real app, you would fetch this from your backend
-    // For now, we'll use localStorage or mock data
     const savedGames = localStorage.getItem('recentGames');
     if (savedGames) {
       const games = JSON.parse(savedGames);
-      // Convert timestamp strings back to Date objects
       const gamesWithDates = games.map((game: any) => ({
         ...game,
         timestamp: new Date(game.timestamp)
@@ -32,16 +29,18 @@ const RecentGamesPageRoute = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
+    <div className="page-container">
+      <div className="relative z-10 container mx-auto px-4 py-6">
         <div className="flex items-center gap-4 mb-6">
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="pixel-pill">
             <Link to="/">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Game
+              BACK TO GAME
             </Link>
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold">Recent Games</h1>
+          <h1 className="text-2xl md:text-3xl font-bold pixel-font-xl text-teal-300 neon-text">
+            RECENT GAMES
+          </h1>
         </div>
         
         <RecentGamesPage games={recentGames} />

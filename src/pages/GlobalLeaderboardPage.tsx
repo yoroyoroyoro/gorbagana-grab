@@ -13,7 +13,6 @@ interface LeaderboardEntry {
 }
 
 const GlobalLeaderboardPage = () => {
-  // Mock leaderboard data - in a real app, this would come from your backend
   const [leaderboard] = useState<LeaderboardEntry[]>([
     { rank: 1, address: '8K7qX2vN9mB3pL4wR5tY6uI7oP8aS9dF', totalWinnings: 23.45, gamesWon: 12 },
     { rank: 2, address: '9M4tE6rY8uI3oP2aS7dF5gH1jK9lZ3xC', totalWinnings: 18.92, gamesWon: 8 },
@@ -23,16 +22,18 @@ const GlobalLeaderboardPage = () => {
   ]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
+    <div className="page-container">
+      <div className="relative z-10 container mx-auto px-4 py-6">
         <div className="flex items-center gap-4 mb-6">
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="pixel-pill">
             <Link to="/">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Game
+              BACK TO GAME
             </Link>
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold">Global Leaderboard</h1>
+          <h1 className="text-2xl md:text-3xl font-bold pixel-font-xl text-teal-300 neon-text">
+            GLOBAL LEADERBOARD
+          </h1>
         </div>
         
         <LeaderboardPage players={leaderboard} />

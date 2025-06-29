@@ -181,25 +181,27 @@
     background: linear-gradient(135deg, rgb(32, 178, 170), rgb(0, 191, 165));
     box-shadow: 0 0 8px rgba(32, 178, 170, 0.8);
   }
-}
 
-/* Cyberpunk-themed animations */
-@keyframes glow {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
-}
-
-@keyframes scan-lines {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(4px); }
-}
-
-@keyframes cyber-pulse {
-  0%, 100% { 
-    box-shadow: 0 0 5px rgba(32, 178, 170, 0.5);
+  /* Page container styling for consistency */
+  .page-container {
+    min-h-screen;
+    background-image: url('/lovable-uploads/b5868980-a9d4-4d82-af89-852e2bd641eb.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
-  50% { 
-    box-shadow: 0 0 20px rgba(32, 178, 170, 0.8), 0 0 30px rgba(64, 224, 160, 0.4);
+
+  .page-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(16, 25, 35, 0.7);
+    backdrop-filter: blur(1px);
+    z-index: -1;
   }
 }
 
@@ -207,8 +209,4 @@
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
-}
-
-.cyber-glow {
-  animation: cyber-pulse 2s ease-in-out infinite;
 }

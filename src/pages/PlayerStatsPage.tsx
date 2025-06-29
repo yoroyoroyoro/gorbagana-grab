@@ -28,8 +28,6 @@ const PlayerStatsPage = () => {
 
   useEffect(() => {
     if (isConnected && publicKey) {
-      // In a real app, you would fetch this data from your backend
-      // For now, we'll use mock data or localStorage
       const savedStats = localStorage.getItem(`playerStats_${publicKey}`);
       if (savedStats) {
         setPlayerStats(JSON.parse(savedStats));
@@ -38,16 +36,18 @@ const PlayerStatsPage = () => {
   }, [isConnected, publicKey]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
+    <div className="page-container">
+      <div className="relative z-10 container mx-auto px-4 py-6">
         <div className="flex items-center gap-4 mb-6">
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="pixel-pill">
             <Link to="/">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Game
+              BACK TO GAME
             </Link>
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold">Player Statistics</h1>
+          <h1 className="text-2xl md:text-3xl font-bold pixel-font-xl text-teal-300 neon-text">
+            PLAYER STATISTICS
+          </h1>
         </div>
         
         <StatsPage
