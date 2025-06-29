@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import GameHeader from '@/components/GameHeader';
 import GameArea from '@/components/GameArea';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
@@ -48,6 +48,9 @@ const Index = () => {
     bestScore: 0,
     winRate: 0
   });
+
+  // Modal state
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   // Initialize or get current round
   useEffect(() => {
@@ -340,63 +343,65 @@ const Index = () => {
 
       {/* Help Icon - Bottom Right */}
       <div className="fixed bottom-8 right-8 z-30">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="relative cursor-pointer group">
-                {/* Animated "Click Me" Text - Positioned directly above */}
-                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-teal-300 pixel-font text-sm animate-bounce whitespace-nowrap">
-                  CLICK ME
-                </div>
-                
-                {/* Help Icon - Made bigger with glow effect */}
-                <div className="w-32 h-32 hover:scale-110 transition-transform duration-200">
-                  <img 
-                    src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
-                    alt="Help Character" 
-                    className="w-full h-full pixel-art"
-                    style={{
-                      filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
-                    }}
-                  />
+        <Dialog open={isHelpModalOpen} onOpenChange={setIsHelpModalOpen}>
+          <DialogTrigger asChild>
+            <div className="relative cursor-pointer group">
+              {/* Animated "Click Me" Text - Properly centered above */}
+              <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-teal-300 pixel-font text-sm animate-bounce whitespace-nowrap">
+                CLICK ME
+              </div>
+              
+              {/* Help Icon - Made bigger with glow effect */}
+              <div className="w-32 h-32 hover:scale-110 transition-transform duration-200">
+                <img 
+                  src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
+                  alt="Help Character" 
+                  className="w-full h-full pixel-art"
+                  style={{
+                    filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
+                  }}
+                />
+              </div>
+            </div>
+          </DialogTrigger>
+          
+          <DialogContent className="max-w-lg bg-gradient-to-r from-purple-900/95 to-blue-900/95 border-purple-400/40 text-purple-100">
+            <DialogHeader>
+              <DialogTitle className="pixel-font text-xl text-purple-300 text-center">
+                ROUND SYSTEM GUIDE
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="pixel-font text-sm space-y-4 mt-4">
+              <div className="flex items-start gap-3">
+                <span className="text-teal-300 text-lg">•</span>
+                <span>Perfect hit (100 score) = Instant jackpot win!</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-emerald-300 text-lg">•</span>
+                <span>Each round lasts exactly 24 hours</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-cyan-300 text-lg">•</span>
+                <span>If no jackpot, highest scorer wins the prize pool</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-yellow-300 text-lg">•</span>
+                <span>Tied scores? First to achieve it wins!</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-pink-300 text-lg">•</span>
+                <span>0.05 GOR per game adds to the prize pool</span>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-purple-400/30 text-center">
+                <div className="text-purple-300 pixel-font text-sm">
+                  Pay 0.05 GOR to play • Hit the trash perfectly • Win big!
                 </div>
               </div>
-            </TooltipTrigger>
-            <TooltipContent 
-              side="left" 
-              className="max-w-sm p-6 bg-gradient-to-r from-purple-900/95 to-blue-900/95 border-purple-400/40 text-purple-100"
-            >
-              <h3 className="pixel-font text-lg mb-4 text-purple-300">ROUND SYSTEM GUIDE</h3>
-              <div className="pixel-font text-sm space-y-3">
-                <div className="flex items-start gap-2">
-                  <span className="text-teal-300">•</span>
-                  <span>Perfect hit (100 score) = Instant jackpot win!</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-emerald-300">•</span>
-                  <span>Each round lasts exactly 24 hours</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-cyan-300">•</span>
-                  <span>If no jackpot, highest scorer wins the prize pool</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-yellow-300">•</span>
-                  <span>Tied scores? First to achieve it wins!</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-pink-300">•</span>
-                  <span>0.05 GOR per game adds to the prize pool</span>
-                </div>
-                <div className="mt-4 pt-3 border-t border-purple-400/30">
-                  <div className="text-purple-300 pixel-font text-xs">
-                    Pay 0.05 GOR to play • Hit the trash perfectly • Win big!
-                  </div>
-                </div>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
