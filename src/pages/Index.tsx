@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import GameHeader from '@/components/GameHeader';
@@ -6,6 +5,9 @@ import GameArea from '@/components/GameArea';
 import PlayerStats from '@/components/PlayerStats';
 import Leaderboard from '@/components/Leaderboard';
 import RecentGames from '@/components/RecentGames';
+import { useBackpackWallet } from '@/hooks/useBackpackWallet';
+import { gorConnection } from '@/utils/gorConnection';
+import { PublicKey } from '@solana/web3.js';
 
 // Mock data types
 interface PlayerData {
@@ -32,6 +34,10 @@ interface LeaderboardEntry {
 }
 
 const Index = () => {
+  // Wallet integration
+  const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect } = useBackpackWallet();
+  const [gorBalance, setGorBalance] = useState<number>(0);
+
   // Game state
   const [isPlaying, setIsPlaying] = useState(false);
   const [prizePool, setPrizePool] = useState(0);
@@ -79,36 +85,56 @@ const Index = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleConnectWallet = async () => {
+  // Check GOR balance when wallet connects
+  useEffect(() => {
+    if (isConnected && publicKey) {
+      checkGorBalance();
+    }
+  }, [isConnected, publicKey]);
+
+  const checkGorBalance = async () => {
+    if (!publicKey) return;
+    
     try {
-      // Mock wallet connection
-      toast.success('Wallet connected successfully!');
-      const mockAddress = '8K7qX2vN9mB3pL4wR5tY6uI7oP8aS9dF1gH2jK3lZ4xC';
-      setWalletAddress(mockAddress);
-      setIsWalletConnected(true);
-      
-      // Load player stats
-      setPlayerStats({
-        walletAddress: mockAddress,
-        totalWinnings: 5.67,
-        gamesPlayed: 15,
-        bestScore: 94,
-        winRate: 26.7
-      });
+      const pubKey = new PublicKey(publicKey);
+      const balance = await gorConnection.getBalance(pubKey);
+      setGorBalance(balance);
     } catch (error) {
-      toast.error('Failed to connect wallet');
+      console.error('Failed to check GOR balance:', error);
     }
   };
 
+  const handleConnectWallet = async () => {
+    await connectWallet();
+  };
+
   const handleStartGame = async () => {
-    if (!isWalletConnected) {
-      toast.error('Please connect your wallet first');
+    if (!isConnected || !publicKey) {
+      toast.error('Please connect your Backpack wallet first');
+      return;
+    }
+
+    if (gorBalance < 0.05) {
+      toast.error('Insufficient GOR balance. You need at least 0.05 GOR to play.');
       return;
     }
 
     try {
-      // Mock payment processing
-      toast.success('Payment successful! Game starting...');
+      // Create payment transaction
+      const fromPubkey = new PublicKey(publicKey);
+      // For demo purposes, using the same address as recipient (in production, this would be the game's treasury)
+      const toPubkey = fromPubkey; 
+      
+      const transaction = await gorConnection.createGamePaymentTransaction(
+        fromPubkey,
+        toPubkey,
+        0.05
+      );
+
+      // Note: In a real implementation, you would sign and send the transaction here
+      // For now, we'll simulate the payment
+      toast.success('Payment of 0.05 GOR processed! Game starting...');
+      
       setPrizePool(prev => prev + 0.05);
       setIsPlaying(true);
       setCurrentScore(null);
@@ -118,7 +144,11 @@ const Index = () => {
         ...prev,
         gamesPlayed: prev.gamesPlayed + 1
       }));
+
+      // Update balance
+      setGorBalance(prev => prev - 0.05);
     } catch (error) {
+      console.error('Payment failed:', error);
       toast.error('Payment failed. Please try again.');
     }
   };
@@ -178,24 +208,53 @@ const Index = () => {
           <p className="text-muted-foreground text-lg">
             Time your tap. Win the pot. GOR token precision gaming.
           </p>
+          {isConnected && (
+            <p className="text-sm text-accent mt-2">
+              Balance: {gorBalance.toFixed(4)} GOR
+            </p>
+          )}
         </div>
 
         {/* Game Header */}
         <GameHeader
           prizePool={prizePool}
           timeRemaining={timeRemaining}
-          isWalletConnected={isWalletConnected}
-          walletAddress={walletAddress}
+          isWalletConnected={isConnected}
+          walletAddress={publicKey}
           onConnectWallet={handleConnectWallet}
         />
+
+        {/* Wallet Connection Status */}
+        {!isConnected && (
+          <div className="text-center mb-6 p-4 bg-card/50 border border-border rounded-lg">
+            <p className="text-muted-foreground mb-2">
+              Connect your Backpack wallet to start playing
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Make sure you're connected to the GOR testnet (RPC: http://rpc.gorbagana.wtf)
+            </p>
+          </div>
+        )}
 
         {/* Game Area */}
         <GameArea
           isPlaying={isPlaying}
           onStop={handleGameStop}
           onStartGame={handleStartGame}
-          canPlay={isWalletConnected}
+          canPlay={isConnected && gorBalance >= 0.05}
         />
+
+        {/* Insufficient balance warning */}
+        {isConnected && gorBalance < 0.05 && (
+          <div className="text-center mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <p className="text-destructive">
+              Insufficient GOR balance. You need at least 0.05 GOR to play.
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Current balance: {gorBalance.toFixed(4)} GOR
+            </p>
+          </div>
+        )}
 
         {/* Stats and Leaderboards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
