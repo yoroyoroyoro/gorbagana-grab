@@ -28,46 +28,46 @@ const GameHeader = ({
   }, [timeRemaining]);
 
   return (
-    <div className="w-full bg-card/80 backdrop-blur-sm pixel-border p-4 mb-6">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+    <div className="w-full retro-card pixel-border pixel-bevel p-6 mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-6">
         {/* Prize Pool */}
-        <div className="flex items-center gap-3 pixel-border bg-background/40 p-3 rounded-none">
-          <Trophy className="w-6 h-6 text-accent pixel-art" />
+        <div className="flex items-center gap-4 pixel-border pixel-bevel retro-card p-4">
+          <Trophy className="w-8 h-8 text-accent pixel-art" />
           <div>
-            <div className="text-sm text-muted-foreground pixel-font">Prize Pool</div>
-            <div className="text-2xl font-bold text-accent neon-text pixel-font">
+            <div className="pixel-font text-muted-foreground mb-1">PRIZE POOL</div>
+            <div className="pixel-font-lg text-accent neon-text">
               {prizePool.toFixed(2)} GOR
             </div>
           </div>
         </div>
 
         {/* Timer */}
-        <div className="flex items-center gap-3 pixel-border bg-background/40 p-3 rounded-none">
-          <Timer className="w-6 h-6 text-primary pixel-art" />
+        <div className="flex items-center gap-4 pixel-border pixel-bevel retro-card p-4">
+          <Timer className="w-8 h-8 text-primary pixel-art" />
           <div className="text-center">
-            <div className="text-sm text-muted-foreground pixel-font">Round Ends In</div>
-            <div className="text-xl font-mono text-primary font-bold pixel-font neon-text">
+            <div className="pixel-font text-muted-foreground mb-1">ROUND ENDS IN</div>
+            <div className="pixel-font-lg text-primary neon-text">
               {timeDisplay}
             </div>
           </div>
         </div>
 
         {/* Wallet Connection */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {isWalletConnected ? (
-            <div className="text-right pixel-border bg-background/40 p-3 rounded-none">
-              <div className="text-sm text-muted-foreground pixel-font">Connected</div>
-              <div className="text-sm font-mono pixel-font text-primary">
+            <div className="text-right pixel-border pixel-bevel retro-card p-4">
+              <div className="pixel-font text-muted-foreground mb-1">CONNECTED</div>
+              <div className="pixel-font text-primary">
                 {walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}
               </div>
             </div>
           ) : (
             <Button 
               onClick={onConnectWallet}
-              className="pixel-button bg-primary hover:bg-primary/80 text-primary-foreground border-primary"
+              className="pixel-button border-primary text-primary-foreground"
             >
               <Wallet className="w-4 h-4 mr-2 pixel-art" />
-              <span className="pixel-font">Connect Wallet</span>
+              <span className="pixel-font">CONNECT WALLET</span>
             </Button>
           )}
         </div>

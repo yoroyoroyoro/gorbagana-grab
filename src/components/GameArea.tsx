@@ -51,19 +51,19 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
   };
 
   const getScoreColor = (score: number) => {
-    if (score === 100) return 'text-accent';
-    if (score >= 90) return 'text-green-400';
+    if (score === 100) return 'text-primary neon-text';
+    if (score >= 90) return 'text-accent';
     if (score >= 70) return 'text-blue-400';
     if (score >= 50) return 'text-yellow-400';
-    return 'text-red-400';
+    return 'text-destructive';
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-8">
-      {/* Game Bar Container with Pixelated Styling */}
+      {/* Game Bar Container with 8-bit Styling */}
       <div 
         ref={gameAreaRef}
-        className="relative h-32 bg-card/90 backdrop-blur-sm pixel-border game-glow mb-6 overflow-hidden"
+        className="relative h-32 game-area pixel-border pixel-bevel mb-6 overflow-hidden"
         style={{
           backgroundImage: `url('/lovable-uploads/58d1aeda-ee90-40d9-9e97-2b52f4024eae.png')`,
           backgroundSize: 'cover',
@@ -71,47 +71,46 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
           imageRendering: 'pixelated'
         }}
       >
-        {/* Dark overlay for better visibility */}
-        <div className="absolute inset-0 bg-background/60" />
+        {/* Pixel dither overlay for better visibility */}
+        <div className="absolute inset-0 pixel-dither opacity-70" />
         
-        {/* Jackpot Zone (center 10%) */}
+        {/* Jackpot Zone (center 10%) with scan lines and sparkles */}
         <div 
-          className="absolute top-0 h-full bg-accent/30 backdrop-blur-sm jackpot-glow z-10"
+          className="absolute top-4 h-24 jackpot-zone z-10"
           style={{ 
             left: '45%', 
-            width: '10%',
-            borderLeft: '3px solid hsl(var(--accent))',
-            borderRight: '3px solid hsl(var(--accent))'
+            width: '10%'
           }}
         >
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xs font-bold text-accent neon-text pixel-font pixel-flicker">
+            <span className="pixel-font text-primary neon-text">
               JACKPOT
             </span>
           </div>
         </div>
 
-        {/* Cursor */}
+        {/* 8-bit Cursor */}
         {isPlaying && (
           <div 
-            className="absolute top-0 w-2 h-full bg-primary z-20 pixel-border transition-none"
+            className="absolute top-0 w-3 h-full z-20 pixel-border transition-none"
             style={{ 
               left: `${cursorPosition}%`,
-              boxShadow: '0 0 20px hsl(var(--primary)), 0 0 40px hsl(var(--primary))',
-              borderColor: 'hsl(var(--primary))'
+              background: 'linear-gradient(180deg, hsl(var(--pixel-aqua)) 0%, hsl(var(--pixel-aqua)) 100%)',
+              boxShadow: '0 0 20px hsl(var(--pixel-aqua)), 0 0 40px hsl(var(--pixel-aqua))',
+              borderColor: 'hsl(var(--pixel-bright))'
             }}
           />
         )}
 
-        {/* Score Display */}
+        {/* Score Display with 8-bit styling */}
         {gameScore !== null && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-30">
-            <div className="text-center pixel-border bg-card/90 p-6">
-              <div className={`text-4xl font-bold ${getScoreColor(gameScore)} neon-text pixel-font mb-2`}>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-30">
+            <div className="text-center pixel-border pixel-bevel retro-card p-8">
+              <div className={`text-5xl font-bold ${getScoreColor(gameScore)} pixel-font-xl mb-4`}>
                 {gameScore}
               </div>
               {gameScore === 100 && (
-                <div className="text-accent text-lg font-bold pixel-font pixel-flicker">
+                <div className="text-primary pixel-font-lg neon-text">
                   JACKPOT!
                 </div>
               )}
@@ -120,30 +119,36 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         )}
       </div>
 
-      {/* Game Controls */}
+      {/* Game Controls with 8-bit buttons */}
       <div className="text-center">
         {!isPlaying ? (
           <Button
             onClick={onStartGame}
             disabled={!canPlay}
-            className="pixel-button bg-primary hover:bg-primary/80 text-primary-foreground text-xl px-8 py-4 pulse-glow border-primary"
+            className="pixel-button border-primary text-primary-foreground pixel-font-lg px-8 py-4"
           >
-            {canPlay ? 'Pay 0.05 GOR & Play' : 'Connect Wallet'}
+            {canPlay ? 'PAY 0.05 GOR & PLAY' : 'CONNECT WALLET'}
           </Button>
         ) : (
           <Button
             onClick={handleStop}
-            className="pixel-button bg-accent hover:bg-accent/80 text-accent-foreground text-xl px-8 py-4 pulse-glow border-accent"
+            className="pixel-button border-accent bg-accent text-accent-foreground pixel-font-lg px-8 py-4"
           >
             STOP!
           </Button>
         )}
       </div>
 
-      {/* Instructions */}
-      <div className="mt-4 text-center text-muted-foreground">
-        <p className="pixel-font text-sm">Time your tap to land in the golden jackpot zone!</p>
-        <p className="text-xs mt-1 pixel-font">Perfect score (100) wins the entire prize pool instantly!</p>
+      {/* Instructions with pixel styling */}
+      <div className="mt-6 text-center">
+        <div className="pixel-border pixel-bevel retro-card p-4">
+          <p className="pixel-font text-muted-foreground mb-2">
+            TIME YOUR TAP TO LAND IN THE GOLDEN JACKPOT ZONE!
+          </p>
+          <p className="pixel-font text-xs text-muted-foreground">
+            PERFECT SCORE (100) WINS THE ENTIRE PRIZE POOL INSTANTLY!
+          </p>
+        </div>
       </div>
     </div>
   );
