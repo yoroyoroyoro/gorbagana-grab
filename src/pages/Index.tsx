@@ -211,25 +211,25 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-blue-900 relative overflow-hidden">
-      {/* Simple gradient background with subtle texture */}
-      <div className="fixed inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-cyan-500/10" />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Cyberpunk overlay for better contrast */}
+      <div className="fixed inset-0 bg-gradient-to-b from-teal-900/20 via-transparent to-emerald-900/30 pointer-events-none" />
       
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header - Clean and Simple */}
+        {/* Header - Cyberpunk themed */}
         <div className="text-center mb-12">
           <div className="flex justify-center items-center gap-6 mb-8">
             <img 
               src="/lovable-uploads/b2c25c3c-fa02-453c-ac6c-b981edeccf43.png" 
               alt="Gorbagana" 
-              className="w-16 h-16 pixel-art"
+              className="w-16 h-16 pixel-art cyber-glow"
             />
-            <h1 className="text-4xl font-bold pixel-font-xl text-white neon-text">
+            <h1 className="text-4xl font-bold pixel-font-xl text-teal-300 neon-text">
               GORBAGANA GRAB
             </h1>
           </div>
           
-          {/* Navigation Pills - Top Right Style */}
+          {/* Navigation Pills - Cyberpunk style */}
           <div className="flex justify-center gap-4 mb-8">
             <Button asChild variant="outline" className="pixel-pill">
               <Link to="/stats">
@@ -252,27 +252,27 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Game Stats - Simplified */}
+        {/* Game Stats - Cyberpunk themed */}
         <div className="flex justify-center gap-8 mb-8">
-          <div className="clean-card text-center">
-            <div className="text-2xl font-bold text-cyan-400 pixel-font">{prizePool.toFixed(2)} GOR</div>
-            <div className="text-sm text-gray-400 pixel-font">PRIZE POOL</div>
+          <div className="clean-card text-center cyber-glow">
+            <div className="text-2xl font-bold text-teal-300 pixel-font">{prizePool.toFixed(2)} GOR</div>
+            <div className="text-sm text-teal-500 pixel-font">PRIZE POOL</div>
           </div>
           
-          <div className="clean-card text-center">
-            <div className="text-2xl font-bold text-pink-400 pixel-font">{formatTime()}</div>
-            <div className="text-sm text-gray-400 pixel-font">TIME LEFT</div>
+          <div className="clean-card text-center cyber-glow">
+            <div className="text-2xl font-bold text-emerald-300 pixel-font">{formatTime()}</div>
+            <div className="text-sm text-emerald-500 pixel-font">TIME LEFT</div>
           </div>
           
           {isConnected && (
-            <div className="clean-card text-center">
-              <div className="text-2xl font-bold text-green-400 pixel-font">{gorBalance.toFixed(2)} GOR</div>
-              <div className="text-sm text-gray-400 pixel-font">BALANCE</div>
+            <div className="clean-card text-center cyber-glow">
+              <div className="text-2xl font-bold text-cyan-300 pixel-font">{gorBalance.toFixed(2)} GOR</div>
+              <div className="text-sm text-cyan-500 pixel-font">BALANCE</div>
             </div>
           )}
         </div>
 
-        {/* Game Area - Clean and Focused */}
+        {/* Game Area - Enhanced for cyberpunk theme */}
         <GameArea
           isPlaying={isPlaying}
           onStop={handleGameStop}
@@ -280,23 +280,23 @@ const Index = () => {
           canPlay={isConnected && balanceLoaded && gorBalance >= 0.05}
         />
 
-        {/* Wallet Connection - Only show if not connected */}
+        {/* Wallet Connection - Cyberpunk styled */}
         {!isConnected && (
           <div className="text-center mt-8">
             <Button 
               onClick={handleConnectWallet}
-              className="pixel-button-primary"
+              className="pixel-button-primary cyber-glow"
             >
               CONNECT WALLET TO PLAY
             </Button>
           </div>
         )}
 
-        {/* Balance Warning - Clean notification */}
+        {/* Balance Warning - Cyberpunk notification */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
           <div className="text-center mt-6">
-            <div className="clean-card border-red-500/50 bg-red-900/20">
-              <p className="text-red-400 pixel-font">
+            <div className="clean-card border-red-400/50 bg-red-900/30">
+              <p className="text-red-300 pixel-font">
                 NEED 0.05 GOR TO PLAY
               </p>
             </div>

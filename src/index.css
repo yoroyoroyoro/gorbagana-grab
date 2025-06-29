@@ -8,26 +8,26 @@
 
 @layer base {
   :root {
-    /* Clean, modern cyber palette */
-    --background: 240 10% 5%;
+    /* Cyberpunk cityscape palette - deep teals, emerald greens, navy blues */
+    --background: 210 30% 8%;
     --foreground: 0 0% 95%;
-    --card: 240 10% 8%;
+    --card: 180 20% 12%;
     --card-foreground: 0 0% 95%;
-    --popover: 240 10% 8%;
+    --popover: 180 20% 12%;
     --popover-foreground: 0 0% 95%;
-    --primary: 150 100% 50%;
-    --primary-foreground: 240 10% 5%;
-    --secondary: 180 100% 50%;
-    --secondary-foreground: 240 10% 5%;
-    --muted: 240 5% 15%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 300 100% 70%;
-    --accent-foreground: 240 10% 5%;
+    --primary: 160 80% 45%;
+    --primary-foreground: 210 30% 8%;
+    --secondary: 180 60% 50%;
+    --secondary-foreground: 210 30% 8%;
+    --muted: 200 15% 20%;
+    --muted-foreground: 200 10% 65%;
+    --accent: 140 70% 60%;
+    --accent-foreground: 210 30% 8%;
     --destructive: 0 85% 60%;
     --destructive-foreground: 0 0% 95%;
-    --border: 240 10% 15%;
-    --input: 240 10% 10%;
-    --ring: 150 100% 50%;
+    --border: 180 25% 25%;
+    --input: 180 20% 15%;
+    --ring: 160 80% 45%;
     --radius: 0px;
   }
 }
@@ -45,6 +45,23 @@
     font-family: 'Press Start 2P', monospace;
     font-size: 12px;
     line-height: 1.6;
+    background-image: url('/lovable-uploads/b5868980-a9d4-4d82-af89-852e2bd641eb.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(16, 25, 35, 0.7);
+    backdrop-filter: blur(1px);
+    z-index: -1;
   }
 }
 
@@ -68,24 +85,24 @@
     line-height: 2.2;
   }
 
-  /* Clean card styling - less busy */
+  /* Clean card styling with cyberpunk colors */
   .clean-card {
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(22, 40, 50, 0.85);
+    border: 2px solid rgba(64, 224, 160, 0.3);
     padding: 16px 24px;
     backdrop-filter: blur(10px);
   }
 
   /* Simple pixel borders */
   .pixel-border {
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(64, 224, 160, 0.4);
   }
 
-  /* Clean button styling */
+  /* Clean button styling with cyberpunk theme */
   .pixel-pill {
-    background: rgba(0, 0, 0, 0.3);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: white;
+    background: rgba(22, 40, 50, 0.8);
+    border: 2px solid rgba(64, 224, 160, 0.4);
+    color: rgb(64, 224, 160);
     font-family: 'Press Start 2P', monospace;
     font-size: 10px;
     padding: 12px 20px;
@@ -94,14 +111,15 @@
   }
 
   .pixel-pill:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(64, 224, 160, 0.1);
+    border-color: rgba(64, 224, 160, 0.6);
     transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(64, 224, 160, 0.3);
   }
 
   .pixel-button-primary {
-    background: linear-gradient(135deg, #ff006e, #8338ec);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, rgba(32, 178, 170, 0.9), rgba(0, 191, 165, 0.9));
+    border: 2px solid rgba(64, 224, 160, 0.6);
     color: white;
     font-family: 'Press Start 2P', monospace;
     font-size: 12px;
@@ -111,13 +129,14 @@
 
   .pixel-button-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 0, 110, 0.3);
+    box-shadow: 0 8px 25px rgba(32, 178, 170, 0.4);
+    background: linear-gradient(135deg, rgba(32, 178, 170, 1), rgba(0, 191, 165, 1));
   }
 
-  /* Game specific styling */
+  /* Game specific styling with cyberpunk theme */
   .game-container {
-    background: rgba(0, 0, 0, 0.6);
-    border: 3px solid rgba(255, 255, 255, 0.2);
+    background: rgba(16, 35, 45, 0.9);
+    border: 3px solid rgba(64, 224, 160, 0.4);
     backdrop-filter: blur(15px);
     padding: 32px;
   }
@@ -125,45 +144,46 @@
   .jackpot-zone {
     background: linear-gradient(90deg, 
       transparent 0%, 
-      rgba(0, 255, 127, 0.2) 25%,
-      rgba(0, 255, 127, 0.4) 50%,
-      rgba(0, 255, 127, 0.2) 75%,
+      rgba(32, 178, 170, 0.3) 25%,
+      rgba(32, 178, 170, 0.5) 50%,
+      rgba(32, 178, 170, 0.3) 75%,
       transparent 100%
     );
-    border: 2px solid #00ff7f;
-    box-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
+    border: 2px solid rgb(32, 178, 170);
+    box-shadow: 0 0 20px rgba(32, 178, 170, 0.6);
   }
 
-  /* Neon text effect - more subtle */
+  /* Neon text effect with cyberpunk colors */
   .neon-text {
     text-shadow: 
       0 0 5px currentColor,
-      0 0 10px currentColor;
+      0 0 10px currentColor,
+      0 0 15px rgba(32, 178, 170, 0.5);
   }
 
-  /* Progress tiles - cleaner look */
+  /* Progress tiles with cyberpunk styling */
   .pixel-progress {
     display: grid;
     grid-template-columns: repeat(20, 1fr);
     gap: 2px;
     height: 20px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(16, 35, 45, 0.8);
+    border: 2px solid rgba(64, 224, 160, 0.4);
     padding: 4px;
   }
 
   .pixel-progress-tile {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(30, 50, 60, 0.6);
     transition: all 0.2s ease;
   }
 
   .pixel-progress-tile.active {
-    background: linear-gradient(135deg, #00ff7f, #00bcd4);
-    box-shadow: 0 0 8px rgba(0, 255, 127, 0.6);
+    background: linear-gradient(135deg, rgb(32, 178, 170), rgb(0, 191, 165));
+    box-shadow: 0 0 8px rgba(32, 178, 170, 0.8);
   }
 }
 
-/* Simplified animations */
+/* Cyberpunk-themed animations */
 @keyframes glow {
   0%, 100% { opacity: 0.8; }
   50% { opacity: 1; }
@@ -174,8 +194,21 @@
   100% { transform: translateY(4px); }
 }
 
+@keyframes cyber-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(32, 178, 170, 0.5);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(32, 178, 170, 0.8), 0 0 30px rgba(64, 224, 160, 0.4);
+  }
+}
+
 .pixel-art {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+}
+
+.cyber-glow {
+  animation: cyber-pulse 2s ease-in-out infinite;
 }

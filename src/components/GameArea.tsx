@@ -50,20 +50,35 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
   };
 
   const getScoreColor = (score: number) => {
-    if (score === 100) return 'text-green-400';
-    if (score >= 90) return 'text-cyan-400';
-    if (score >= 70) return 'text-blue-400';
-    if (score >= 50) return 'text-yellow-400';
-    return 'text-red-400';
+    if (score === 100) return 'text-teal-300';
+    if (score >= 90) return 'text-cyan-300';
+    if (score >= 70) return 'text-emerald-300';
+    if (score >= 50) return 'text-yellow-300';
+    return 'text-red-300';
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Clean Game Container */}
-      <div className="game-container mb-8">
-        {/* Game Bar - Simplified */}
-        <div className="relative h-24 mb-6 bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-blue-900/50 border-2 border-white/20 overflow-hidden">
-          {/* Jackpot Zone - Clean design */}
+      {/* Cyberpunk Game Container */}
+      <div className="game-container mb-8 cyber-glow">
+        {/* Game Bar - Cyberpunk themed */}
+        <div className="relative h-24 mb-6 bg-gradient-to-r from-teal-900/70 via-emerald-900/70 to-cyan-900/70 border-2 border-teal-400/40 overflow-hidden">
+          {/* Scan lines effect */}
+          <div className="absolute inset-0 opacity-20">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-full h-px bg-teal-300"
+                style={{
+                  top: `${(i + 1) * 12}%`,
+                  animation: `scan-lines 2s linear infinite`,
+                  animationDelay: `${i * 0.3}s`
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Jackpot Zone - Cyberpunk design */}
           <div 
             className="absolute top-4 h-16 jackpot-zone flex items-center justify-center"
             style={{ 
@@ -71,31 +86,31 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
               width: '10%'
             }}
           >
-            <span className="pixel-font text-green-400 neon-text text-xs">
+            <span className="pixel-font text-teal-200 neon-text text-xs">
               ZERO
             </span>
           </div>
 
-          {/* Moving Cursor - Clean design */}
+          {/* Moving Cursor - Cyberpunk design */}
           {isPlaying && (
             <div 
-              className="absolute top-0 w-1 h-full bg-white shadow-lg transition-none z-20"
+              className="absolute top-0 w-1 h-full bg-teal-300 transition-none z-20"
               style={{ 
                 left: `${cursorPosition}%`,
-                boxShadow: '0 0 15px rgba(255, 255, 255, 0.8)'
+                boxShadow: '0 0 15px rgba(32, 178, 170, 0.9), 0 0 30px rgba(64, 224, 160, 0.6)'
               }}
             />
           )}
 
-          {/* Score Display - Clean overlay */}
+          {/* Score Display - Cyberpunk overlay */}
           {gameScore !== null && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-30">
-              <div className="text-center clean-card">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-30">
+              <div className="text-center clean-card cyber-glow">
                 <div className={`text-4xl font-bold ${getScoreColor(gameScore)} pixel-font-xl mb-2`}>
                   {gameScore}
                 </div>
                 {gameScore === 100 && (
-                  <div className="text-green-400 pixel-font neon-text">
+                  <div className="text-teal-300 pixel-font neon-text">
                     JACKPOT!
                   </div>
                 )}
@@ -104,32 +119,32 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
           )}
         </div>
 
-        {/* Game Controls - Clean buttons */}
+        {/* Game Controls - Cyberpunk buttons */}
         <div className="text-center">
           {!isPlaying ? (
             <Button
               onClick={onStartGame}
               disabled={!canPlay}
-              className={canPlay ? "pixel-button-primary" : "pixel-pill opacity-50"}
+              className={canPlay ? "pixel-button-primary cyber-glow" : "pixel-pill opacity-50"}
             >
               {canPlay ? 'PAY 0.05 GOR & PLAY' : 'CONNECT WALLET'}
             </Button>
           ) : (
             <Button
               onClick={handleStop}
-              className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-bold py-4 px-8 pixel-font border-2 border-white/30"
+              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-4 px-8 pixel-font border-2 border-red-400/60 cyber-glow"
             >
               STOP AT ZERO!
             </Button>
           )}
         </div>
 
-        {/* Simple Instructions */}
+        {/* Cyberpunk Instructions */}
         <div className="mt-6 text-center">
-          <p className="pixel-font text-gray-400 text-xs">
+          <p className="pixel-font text-teal-400 text-xs">
             TIME YOUR TAP TO HIT THE ZERO ZONE
           </p>
-          <p className="pixel-font text-gray-500 text-xs mt-2">
+          <p className="pixel-font text-teal-500 text-xs mt-2">
             PERFECT SCORE = INSTANT JACKPOT
           </p>
         </div>
