@@ -184,7 +184,7 @@
 
   /* Page container styling for consistency */
   .page-container {
-    min-h-screen;
+    min-height: 100vh;
     background-image: url('/lovable-uploads/b5868980-a9d4-4d82-af89-852e2bd641eb.png');
     background-size: cover;
     background-position: center;
