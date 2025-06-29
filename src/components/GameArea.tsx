@@ -76,15 +76,21 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
             </span>
           </div>
 
-          {/* Moving Cursor */}
+          {/* Moving Pixel Character Cursor */}
           {isPlaying && (
             <div 
-              className="absolute top-0 w-1 h-full bg-teal-300 transition-none z-20"
+              className="absolute top-1 w-8 h-8 transition-none z-20 flex items-center justify-center"
               style={{ 
-                left: `${cursorPosition}%`,
-                boxShadow: '0 0 15px rgba(32, 178, 170, 0.9), 0 0 30px rgba(64, 224, 160, 0.6)'
+                left: `calc(${cursorPosition}% - 16px)`, // Center the character
+                filter: 'drop-shadow(0 0 10px rgba(32, 178, 170, 0.8))'
               }}
-            />
+            >
+              <img 
+                src="/lovable-uploads/ba2e939e-10ea-4a3f-84ad-76e3dc1d28e7.png" 
+                alt="Game Cursor" 
+                className="w-full h-full pixel-art"
+              />
+            </div>
           )}
 
           {/* Score Display */}
