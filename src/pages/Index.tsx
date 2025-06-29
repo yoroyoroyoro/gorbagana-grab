@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -236,20 +235,20 @@ const Index = () => {
         </div>
       </div>
       
-      <div className="relative z-10 container mx-auto px-4 py-16 max-w-6xl">
+      <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-32">
-          <div className="flex justify-center items-center gap-6 mb-16">
+        <div className="text-center mb-24">
+          <div className="flex justify-center items-center gap-6 mb-12">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 
-              className="w-auto h-52 pixel-art"
+              className="w-auto h-96 pixel-art"
             />
           </div>
         </div>
 
         {/* Game Stats */}
-        <div className="flex justify-center gap-12 mb-20">
+        <div className="flex justify-center gap-12 mb-16">
           <div className="clean-card text-center">
             <div className="text-2xl font-bold text-teal-300 pixel-font">{prizePool.toFixed(2)} GOR</div>
             <div className="text-sm text-teal-500 pixel-font">PRIZE POOL</div>
@@ -269,7 +268,7 @@ const Index = () => {
         </div>
 
         {/* Game Area */}
-        <div className="mb-16">
+        <div className="mb-12">
           <GameArea
             isPlaying={isPlaying}
             onStop={handleGameStop}
@@ -280,7 +279,7 @@ const Index = () => {
 
         {/* Wallet Connection */}
         {!isConnected && (
-          <div className="text-center mt-16">
+          <div className="text-center mt-12">
             <Button 
               onClick={handleConnectWallet}
               className="pixel-button-primary"
@@ -292,7 +291,7 @@ const Index = () => {
 
         {/* Balance Warning */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <div className="clean-card border-red-400/50 bg-red-900/30">
               <p className="text-red-300 pixel-font">
                 NEED 0.05 GOR TO PLAY
