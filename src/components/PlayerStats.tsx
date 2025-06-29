@@ -48,7 +48,7 @@ const PlayerStats = ({
               <span className="text-sm text-muted-foreground">Total Winnings</span>
             </div>
             <div className="text-lg font-bold text-accent">
-              {totalWinnings.toFixed(2)} GOR
+              {totalWinnings.toFixed(2)} SOL
             </div>
           </div>
           

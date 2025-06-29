@@ -114,7 +114,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
             disabled={!canPlay}
             className="bg-primary hover:bg-primary/80 text-primary-foreground text-xl px-8 py-4 pulse-glow"
           >
-            {canPlay ? 'Pay 0.05 GOR & Play' : 'Connect Wallet to Play'}
+            {canPlay ? 'Pay 0.05 SOL & Play' : 'Connect Wallet to Play'}
           </Button>
         ) : (
           <Button

@@ -54,7 +54,7 @@ export const useBackpackWallet = () => {
       }
     } catch (error) {
       console.error('Failed to connect wallet:', error);
-      toast.error('Failed to connect wallet. Make sure you\'re on the GOR testnet.');
+      toast.error('Failed to connect wallet. Make sure you\'re on the Gorbagana testnet (https://rpc.gorbagana.wtf/).');
     } finally {
       setIsLoading(false);
     }

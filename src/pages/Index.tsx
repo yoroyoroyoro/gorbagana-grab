@@ -36,7 +36,7 @@ interface LeaderboardEntry {
 const Index = () => {
   // Wallet integration
   const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect } = useBackpackWallet();
-  const [gorBalance, setGorBalance] = useState<number>(0);
+  const [solBalance, setSolBalance] = useState<number>(0);
 
   // Game state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -85,22 +85,22 @@ const Index = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Check GOR balance when wallet connects
+  // Check SOL balance when wallet connects
   useEffect(() => {
     if (isConnected && publicKey) {
-      checkGorBalance();
+      checkSolBalance();
     }
   }, [isConnected, publicKey]);
 
-  const checkGorBalance = async () => {
+  const checkSolBalance = async () => {
     if (!publicKey) return;
     
     try {
       const pubKey = new PublicKey(publicKey);
       const balance = await gorConnection.getBalance(pubKey);
-      setGorBalance(balance);
+      setSolBalance(balance);
     } catch (error) {
-      console.error('Failed to check GOR balance:', error);
+      console.error('Failed to check SOL balance:', error);
     }
   };
 
@@ -114,8 +114,8 @@ const Index = () => {
       return;
     }
 
-    if (gorBalance < 0.05) {
-      toast.error('Insufficient GOR balance. You need at least 0.05 GOR to play.');
+    if (solBalance < 0.05) {
+      toast.error('Insufficient SOL balance. You need at least 0.05 SOL to play.');
       return;
     }
 
@@ -133,7 +133,7 @@ const Index = () => {
 
       // Note: In a real implementation, you would sign and send the transaction here
       // For now, we'll simulate the payment
-      toast.success('Payment of 0.05 GOR processed! Game starting...');
+      toast.success('Payment of 0.05 SOL processed! Game starting...');
       
       setPrizePool(prev => prev + 0.05);
       setIsPlaying(true);
@@ -146,7 +146,7 @@ const Index = () => {
       }));
 
       // Update balance
-      setGorBalance(prev => prev - 0.05);
+      setSolBalance(prev => prev - 0.05);
     } catch (error) {
       console.error('Payment failed:', error);
       toast.error('Payment failed. Please try again.');
@@ -169,7 +169,7 @@ const Index = () => {
     // Check for instant jackpot or round end
     if (score === 100) {
       gameEntry.prize = prizePool;
-      toast.success(`INSTANT JACKPOT! You won ${prizePool.toFixed(2)} GOR!`);
+      toast.success(`INSTANT JACKPOT! You won ${prizePool.toFixed(2)} SOL!`);
       
       // Update player stats
       setPlayerStats(prev => ({
@@ -206,11 +206,11 @@ const Index = () => {
             JACKPOT SWEEP
           </h1>
           <p className="text-muted-foreground text-lg">
-            Time your tap. Win the pot. GOR token precision gaming.
+            Time your tap. Win the pot. Gorbagana testnet precision gaming.
           </p>
           {isConnected && (
             <p className="text-sm text-accent mt-2">
-              Balance: {gorBalance.toFixed(4)} GOR
+              Balance: {solBalance.toFixed(4)} SOL
             </p>
           )}
         </div>
@@ -231,7 +231,7 @@ const Index = () => {
               Connect your Backpack wallet to start playing
             </p>
             <p className="text-sm text-muted-foreground">
-              Make sure you're connected to the GOR testnet (RPC: http://rpc.gorbagana.wtf)
+              Make sure you're connected to the Gorbagana testnet (RPC: https://rpc.gorbagana.wtf/)
             </p>
           </div>
         )}
@@ -241,17 +241,17 @@ const Index = () => {
           isPlaying={isPlaying}
           onStop={handleGameStop}
           onStartGame={handleStartGame}
-          canPlay={isConnected && gorBalance >= 0.05}
+          canPlay={isConnected && solBalance >= 0.05}
         />
 
         {/* Insufficient balance warning */}
-        {isConnected && gorBalance < 0.05 && (
+        {isConnected && solBalance < 0.05 && (
           <div className="text-center mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <p className="text-destructive">
-              Insufficient GOR balance. You need at least 0.05 GOR to play.
+              Insufficient SOL balance. You need at least 0.05 SOL to play.
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Current balance: {gorBalance.toFixed(4)} GOR
+              Current balance: {solBalance.toFixed(4)} SOL
             </p>
           </div>
         )}
@@ -277,7 +277,7 @@ const Index = () => {
         {/* Footer */}
         <div className="mt-12 text-center text-muted-foreground">
           <p className="text-sm">
-            Powered by GOR Token • RPC: http://rpc.gorbagana.wtf
+            Powered by Gorbagana Testnet • RPC: https://rpc.gorbagana.wtf/
           </p>
           <p className="text-xs mt-2">
             Game resets every 24 hours or on instant jackpot. Play responsibly.

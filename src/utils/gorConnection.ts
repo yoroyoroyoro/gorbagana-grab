@@ -1,20 +1,20 @@
 
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-// GOR testnet RPC endpoint
-const GOR_RPC_URL = 'http://rpc.gorbagana.wtf';
+// Gorbagana testnet RPC endpoint (HTTPS)
+const GORBAGANA_RPC_URL = 'https://rpc.gorbagana.wtf/';
 
 export class GorConnection {
   private connection: Connection;
 
   constructor() {
-    this.connection = new Connection(GOR_RPC_URL, 'confirmed');
+    this.connection = new Connection(GORBAGANA_RPC_URL, 'confirmed');
   }
 
   async getBalance(publicKey: PublicKey): Promise<number> {
     try {
       const balance = await this.connection.getBalance(publicKey);
-      return balance / LAMPORTS_PER_SOL; // Convert from lamports to GOR
+      return balance / LAMPORTS_PER_SOL; // Convert from lamports to SOL
     } catch (error) {
       console.error('Failed to get balance:', error);
       throw error;
@@ -44,7 +44,7 @@ export class GorConnection {
       SystemProgram.transfer({
         fromPubkey,
         toPubkey,
-        lamports: amount * LAMPORTS_PER_SOL, // Convert GOR to lamports
+        lamports: amount * LAMPORTS_PER_SOL, // Convert SOL to lamports
       })
     );
 
