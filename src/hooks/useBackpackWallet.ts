@@ -69,6 +69,7 @@ export const useBackpackWallet = () => {
         toast.success('Wallet disconnected');
       } catch (error) {
         console.error('Failed to disconnect wallet:', error);
+        toast.error('Failed to disconnect wallet');
       }
     }
   };

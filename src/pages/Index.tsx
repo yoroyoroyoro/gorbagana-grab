@@ -1,10 +1,14 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
 import GameHeader from '@/components/GameHeader';
 import GameArea from '@/components/GameArea';
-import PlayerStats from '@/components/PlayerStats';
-import Leaderboard from '@/components/Leaderboard';
-import RecentGames from '@/components/RecentGames';
+import StatsPage from '@/components/StatsPage';
+import LeaderboardPage from '@/components/LeaderboardPage';
+import RecentGamesPage from '@/components/RecentGamesPage';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
 import { gorConnection } from '@/utils/gorConnection';
 import { PublicKey } from '@solana/web3.js';
@@ -36,14 +40,12 @@ interface LeaderboardEntry {
 const Index = () => {
   // Wallet integration
   const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect } = useBackpackWallet();
-  const [solBalance, setSolBalance] = useState<number>(0);
+  const [gorBalance, setGorBalance] = useState<number>(0);
 
   // Game state
   const [isPlaying, setIsPlaying] = useState(false);
   const [prizePool, setPrizePool] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(86400); // 24 hours in seconds
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string>();
   const [currentScore, setCurrentScore] = useState<number | null>(null);
 
   // Player data
@@ -85,27 +87,39 @@ const Index = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Check SOL balance when wallet connects
+  // Check GOR balance when wallet connects
   useEffect(() => {
     if (isConnected && publicKey) {
-      checkSolBalance();
+      checkGorBalance();
     }
   }, [isConnected, publicKey]);
 
-  const checkSolBalance = async () => {
+  const checkGorBalance = async () => {
     if (!publicKey) return;
     
     try {
       const pubKey = new PublicKey(publicKey);
       const balance = await gorConnection.getBalance(pubKey);
-      setSolBalance(balance);
+      setGorBalance(balance);
     } catch (error) {
-      console.error('Failed to check SOL balance:', error);
+      console.error('Failed to check GOR balance:', error);
     }
   };
 
   const handleConnectWallet = async () => {
     await connectWallet();
+  };
+
+  const handleDisconnectWallet = async () => {
+    await disconnect();
+    setGorBalance(0);
+    setPlayerStats({
+      walletAddress: '',
+      totalWinnings: 0,
+      gamesPlayed: 0,
+      bestScore: 0,
+      winRate: 0
+    });
   };
 
   const handleStartGame = async () => {
@@ -114,8 +128,8 @@ const Index = () => {
       return;
     }
 
-    if (solBalance < 0.05) {
-      toast.error('Insufficient SOL balance. You need at least 0.05 SOL to play.');
+    if (gorBalance < 0.05) {
+      toast.error('Insufficient GOR balance. You need at least 0.05 GOR to play.');
       return;
     }
 
@@ -133,7 +147,7 @@ const Index = () => {
 
       // Note: In a real implementation, you would sign and send the transaction here
       // For now, we'll simulate the payment
-      toast.success('Payment of 0.05 SOL processed! Game starting...');
+      toast.success('Payment of 0.05 GOR processed! Game starting...');
       
       setPrizePool(prev => prev + 0.05);
       setIsPlaying(true);
@@ -146,7 +160,7 @@ const Index = () => {
       }));
 
       // Update balance
-      setSolBalance(prev => prev - 0.05);
+      setGorBalance(prev => prev - 0.05);
     } catch (error) {
       console.error('Payment failed:', error);
       toast.error('Payment failed. Please try again.');
@@ -160,7 +174,7 @@ const Index = () => {
     // Create game entry
     const gameEntry: GameEntry = {
       id: Date.now().toString(),
-      player: walletAddress!,
+      player: publicKey!,
       score,
       timestamp: new Date(),
       prize: 0
@@ -169,7 +183,7 @@ const Index = () => {
     // Check for instant jackpot or round end
     if (score === 100) {
       gameEntry.prize = prizePool;
-      toast.success(`INSTANT JACKPOT! You won ${prizePool.toFixed(2)} SOL!`);
+      toast.success(`INSTANT JACKPOT! You won ${prizePool.toFixed(2)} GOR!`);
       
       // Update player stats
       setPlayerStats(prev => ({
@@ -203,16 +217,29 @@ const Index = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent neon-text mb-2">
-            JACKPOT SWEEP
+            GORBAGANA GRAB
           </h1>
           <p className="text-muted-foreground text-lg">
             Time your tap. Win the pot. Gorbagana testnet precision gaming.
           </p>
-          {isConnected && (
-            <p className="text-sm text-accent mt-2">
-              Balance: {solBalance.toFixed(4)} SOL
-            </p>
-          )}
+          <div className="flex justify-center items-center gap-4 mt-4">
+            {isConnected && (
+              <p className="text-sm text-accent">
+                Balance: {gorBalance.toFixed(4)} GOR
+              </p>
+            )}
+            {isConnected && (
+              <Button 
+                onClick={handleDisconnectWallet}
+                variant="outline"
+                size="sm"
+                className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Disconnect
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Game Header */}
@@ -241,38 +268,47 @@ const Index = () => {
           isPlaying={isPlaying}
           onStop={handleGameStop}
           onStartGame={handleStartGame}
-          canPlay={isConnected && solBalance >= 0.05}
+          canPlay={isConnected && gorBalance >= 0.05}
         />
 
         {/* Insufficient balance warning */}
-        {isConnected && solBalance < 0.05 && (
+        {isConnected && gorBalance < 0.05 && (
           <div className="text-center mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <p className="text-destructive">
-              Insufficient SOL balance. You need at least 0.05 SOL to play.
+              Insufficient GOR balance. You need at least 0.05 GOR to play.
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Current balance: {solBalance.toFixed(4)} SOL
+              Current balance: {gorBalance.toFixed(4)} GOR
             </p>
           </div>
         )}
 
-        {/* Stats and Leaderboards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Player Stats */}
-          <PlayerStats
-            walletAddress={walletAddress}
-            totalWinnings={playerStats.totalWinnings}
-            gamesPlayed={playerStats.gamesPlayed}
-            bestScore={playerStats.bestScore}
-            winRate={playerStats.winRate}
-          />
-
-          {/* Leaderboard */}
-          <Leaderboard players={leaderboard} />
-
-          {/* Recent Games */}
-          <RecentGames games={recentGames} />
-        </div>
+        {/* Tabbed Content */}
+        <Tabs defaultValue="stats" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="stats">Player Stats</TabsTrigger>
+            <TabsTrigger value="leaderboard">Global Leaderboard</TabsTrigger>
+            <TabsTrigger value="recent">Recent Games</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="stats">
+            <StatsPage
+              walletAddress={publicKey}
+              totalWinnings={playerStats.totalWinnings}
+              gamesPlayed={playerStats.gamesPlayed}
+              bestScore={playerStats.bestScore}
+              winRate={playerStats.winRate}
+            />
+          </TabsContent>
+          
+          <TabsContent value="leaderboard">
+            <LeaderboardPage players={leaderboard} />
+          </TabsContent>
+          
+          <TabsContent value="recent">
+            <RecentGamesPage games={recentGames} />
+          </TabsContent>
+        </Tabs>
 
         {/* Footer */}
         <div className="mt-12 text-center text-muted-foreground">

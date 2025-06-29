@@ -36,7 +36,7 @@ const GameHeader = ({
           <div>
             <div className="text-sm text-muted-foreground">Prize Pool</div>
             <div className="text-2xl font-bold text-accent neon-text">
-              {prizePool.toFixed(2)} SOL
+              {prizePool.toFixed(2)} GOR
             </div>
           </div>
         </div>

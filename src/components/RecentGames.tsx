@@ -54,7 +54,7 @@ const RecentGames = ({ games }: RecentGamesProps) => {
                   <Target className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <div className="font-mono text-sm">
-                      {game.player.slice(0, 6)}...{game.player.slice(-4)}
+                      {game.player?.slice(0, 6)}...{game.player?.slice(-4)}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {formatTime(game.timestamp)}
