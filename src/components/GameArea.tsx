@@ -60,21 +60,21 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-8">
-      {/* Game Bar Container with 8-bit Styling */}
+      {/* Game Bar Container with Stardew Valley Styling */}
       <div 
         ref={gameAreaRef}
         className="relative h-32 game-area pixel-border pixel-bevel mb-6 overflow-hidden"
         style={{
-          backgroundImage: `url('/lovable-uploads/58d1aeda-ee90-40d9-9e97-2b52f4024eae.png')`,
+          backgroundImage: `url('/lovable-uploads/83da7de6-6774-4cdf-a37f-ac4431a1aa10.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           imageRendering: 'pixelated'
         }}
       >
-        {/* Pixel dither overlay for better visibility */}
+        {/* Valley dither overlay for better visibility */}
         <div className="absolute inset-0 pixel-dither opacity-70" />
         
-        {/* Jackpot Zone (center 10%) with scan lines and sparkles */}
+        {/* Jackpot Zone (center 10%) with valley theme */}
         <div 
           className="absolute top-4 h-24 jackpot-zone z-10"
           style={{ 
@@ -89,20 +89,20 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
           </div>
         </div>
 
-        {/* 8-bit Cursor */}
+        {/* Valley-themed Cursor */}
         {isPlaying && (
           <div 
             className="absolute top-0 w-3 h-full z-20 pixel-border transition-none"
             style={{ 
               left: `${cursorPosition}%`,
-              background: 'linear-gradient(180deg, hsl(var(--pixel-aqua)) 0%, hsl(var(--pixel-aqua)) 100%)',
-              boxShadow: '0 0 20px hsl(var(--pixel-aqua)), 0 0 40px hsl(var(--pixel-aqua))',
-              borderColor: 'hsl(var(--pixel-bright))'
+              background: 'linear-gradient(180deg, hsl(var(--valley-teal)) 0%, hsl(var(--valley-forest)) 100%)',
+              boxShadow: '0 0 20px hsl(var(--valley-teal)), 0 0 40px hsl(var(--valley-forest))',
+              borderColor: 'hsl(var(--valley-light))'
             }}
           />
         )}
 
-        {/* Score Display with 8-bit styling */}
+        {/* Score Display with Valley styling */}
         {gameScore !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-30">
             <div className="text-center pixel-border pixel-bevel retro-card p-8">
@@ -119,7 +119,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         )}
       </div>
 
-      {/* Game Controls with 8-bit buttons */}
+      {/* Game Controls with Valley buttons */}
       <div className="text-center">
         {!isPlaying ? (
           <Button
@@ -139,7 +139,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         )}
       </div>
 
-      {/* Instructions with pixel styling */}
+      {/* Instructions with valley styling */}
       <div className="mt-6 text-center">
         <div className="pixel-border pixel-bevel retro-card p-4">
           <p className="pixel-font text-muted-foreground mb-2">

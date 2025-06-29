@@ -6,52 +6,53 @@
 /* Import chunky pixel fonts */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap');
 
-/* 8-bit Pixel Art Design System */
+/* Stardew Valley Pixel Art Design System */
 
 @layer base {
   :root {
-    /* Core 8-bit palette - 4 main colors + 2 accent */
-    --background: 0 0% 5%;
-    --foreground: 120 100% 80%;
+    /* Stardew Valley inspired palette from the reference image */
+    --background: 200 25% 8%;
+    --foreground: 150 40% 85%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 120 100% 80%;
+    --card: 200 20% 12%;
+    --card-foreground: 150 40% 85%;
 
-    --popover: 0 0% 5%;
-    --popover-foreground: 120 100% 80%;
+    --popover: 200 25% 8%;
+    --popover-foreground: 150 40% 85%;
 
-    /* Solana Green - Primary */
-    --primary: 120 100% 50%;
-    --primary-foreground: 0 0% 5%;
+    /* Forest Green - Primary (main green from cityscape) */
+    --primary: 150 60% 45%;
+    --primary-foreground: 200 25% 8%;
 
-    /* Charcoal - Secondary */
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 120 100% 80%;
+    /* Dark Teal - Secondary */
+    --secondary: 180 30% 20%;
+    --secondary-foreground: 150 40% 85%;
 
-    --muted: 0 0% 12%;
-    --muted-foreground: 120 40% 60%;
+    --muted: 200 20% 15%;
+    --muted-foreground: 150 25% 65%;
 
-    /* Aqua - Accent */
-    --accent: 180 100% 50%;
-    --accent-foreground: 0 0% 5%;
+    /* Bright Teal - Accent */
+    --accent: 170 50% 55%;
+    --accent-foreground: 200 25% 8%;
 
-    /* Purple - Destructive */
-    --destructive: 280 100% 60%;
-    --destructive-foreground: 120 100% 80%;
+    /* Deep Purple - Destructive (window lights) */
+    --destructive: 260 40% 50%;
+    --destructive-foreground: 150 40% 85%;
 
-    --border: 120 100% 30%;
-    --input: 0 0% 12%;
-    --ring: 120 100% 50%;
+    --border: 150 40% 35%;
+    --input: 200 20% 15%;
+    --ring: 150 60% 45%;
 
     --radius: 0px;
 
-    /* 8-bit specific colors */
-    --pixel-green: 120 100% 50%;
-    --pixel-aqua: 180 100% 50%;
-    --pixel-purple: 280 100% 60%;
-    --pixel-charcoal: 0 0% 15%;
-    --pixel-bright: 60 100% 80%;
-    --pixel-dark: 0 0% 5%;
+    /* Stardew Valley specific colors */
+    --valley-forest: 150 60% 45%;
+    --valley-teal: 170 50% 55%;
+    --valley-deep: 180 35% 25%;
+    --valley-purple: 260 40% 50%;
+    --valley-moss: 140 45% 40%;
+    --valley-dark: 200 25% 8%;
+    --valley-light: 150 40% 85%;
   }
 }
 
@@ -66,14 +67,14 @@
   body {
     @apply bg-background text-foreground min-h-screen;
     background: 
-      radial-gradient(circle at 25% 25%, hsl(var(--pixel-purple) / 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, hsl(var(--pixel-aqua) / 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 25% 25%, hsl(var(--valley-purple) / 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(var(--valley-teal) / 0.1) 0%, transparent 50%),
       linear-gradient(135deg, 
-        hsl(var(--pixel-dark)) 0%, 
-        hsl(var(--pixel-charcoal)) 25%,
-        hsl(var(--pixel-dark)) 50%,
-        hsl(var(--pixel-charcoal)) 75%,
-        hsl(var(--pixel-dark)) 100%
+        hsl(var(--valley-dark)) 0%, 
+        hsl(var(--valley-deep)) 25%,
+        hsl(var(--valley-dark)) 50%,
+        hsl(var(--valley-deep)) 75%,
+        hsl(var(--valley-dark)) 100%
       );
     font-family: 'Press Start 2P', monospace;
     font-size: 12px;
@@ -89,8 +90,8 @@
     line-height: 2;
     letter-spacing: 1px;
     text-shadow: 
-      1px 1px 0 hsl(var(--pixel-dark)),
-      2px 2px 0 hsl(var(--pixel-dark) / 0.5);
+      1px 1px 0 hsl(var(--valley-dark)),
+      2px 2px 0 hsl(var(--valley-dark) / 0.5);
   }
 
   .pixel-font-lg {
@@ -99,8 +100,8 @@
     line-height: 2.2;
     letter-spacing: 2px;
     text-shadow: 
-      2px 2px 0 hsl(var(--pixel-dark)),
-      3px 3px 0 hsl(var(--pixel-dark) / 0.5);
+      2px 2px 0 hsl(var(--valley-dark)),
+      3px 3px 0 hsl(var(--valley-dark) / 0.5);
   }
 
   .pixel-font-xl {
@@ -109,17 +110,17 @@
     line-height: 2.5;
     letter-spacing: 3px;
     text-shadow: 
-      3px 3px 0 hsl(var(--pixel-dark)),
-      4px 4px 0 hsl(var(--pixel-dark) / 0.5);
+      3px 3px 0 hsl(var(--valley-dark)),
+      4px 4px 0 hsl(var(--valley-dark) / 0.5);
   }
 
-  /* 8-bit Pixel Borders & Shadows */
+  /* Stardew Valley Pixel Borders & Shadows */
   .pixel-border {
     border: 3px solid hsl(var(--border));
     border-radius: 0;
     box-shadow: 
-      6px 6px 0 hsl(var(--pixel-dark)),
-      9px 9px 0 hsl(var(--pixel-dark) / 0.5);
+      4px 4px 0 hsl(var(--valley-deep)),
+      6px 6px 0 hsl(var(--valley-dark) / 0.7);
     position: relative;
   }
 
@@ -130,7 +131,7 @@
     left: -3px;
     right: -3px;
     bottom: -3px;
-    border: 1px solid hsl(var(--pixel-bright) / 0.3);
+    border: 1px solid hsl(var(--valley-light) / 0.2);
     pointer-events: none;
   }
 
@@ -141,11 +142,11 @@
     left: 3px;
     right: -3px;
     bottom: -3px;
-    border: 1px solid hsl(var(--pixel-dark) / 0.8);
+    border: 1px solid hsl(var(--valley-dark) / 0.8);
     pointer-events: none;
   }
 
-  /* Stepped Corner Bevels */
+  /* Stardew Valley Bevels */
   .pixel-bevel {
     position: relative;
   }
@@ -158,7 +159,7 @@
     width: 6px;
     height: 6px;
     background: linear-gradient(135deg, 
-      hsl(var(--pixel-bright) / 0.5) 0%, 
+      hsl(var(--valley-teal) / 0.4) 0%, 
       transparent 50%);
     clip-path: polygon(0 0, 100% 0, 0 100%);
   }
@@ -171,27 +172,27 @@
     width: 6px;
     height: 6px;
     background: linear-gradient(315deg, 
-      hsl(var(--pixel-dark) / 0.8) 0%, 
+      hsl(var(--valley-dark) / 0.8) 0%, 
       transparent 50%);
     clip-path: polygon(100% 100%, 0 100%, 100% 0);
   }
 
-  /* Dithering Gradient Panels */
+  /* Valley Dithering */
   .pixel-dither {
     background: 
-      radial-gradient(circle at 2px 2px, hsl(var(--pixel-bright) / 0.1) 1px, transparent 1px),
-      radial-gradient(circle at 6px 6px, hsl(var(--pixel-dark) / 0.1) 1px, transparent 1px),
+      radial-gradient(circle at 2px 2px, hsl(var(--valley-moss) / 0.1) 1px, transparent 1px),
+      radial-gradient(circle at 6px 6px, hsl(var(--valley-dark) / 0.1) 1px, transparent 1px),
       linear-gradient(45deg, 
         hsl(var(--card)) 0%, 
         hsl(var(--card)) 25%,
-        hsl(var(--pixel-charcoal) / 0.8) 50%,
+        hsl(var(--valley-deep) / 0.8) 50%,
         hsl(var(--card)) 75%,
         hsl(var(--card)) 100%
       );
     background-size: 8px 8px, 8px 8px, 100% 100%;
   }
 
-  /* 8-bit Button Styling */
+  /* Stardew Valley Button Styling */
   .pixel-button {
     border: 3px solid;
     border-radius: 0;
@@ -203,82 +204,81 @@
     position: relative;
     transition: all 0.1s step-end;
     box-shadow: 
-      6px 6px 0 hsl(var(--pixel-dark)),
-      9px 9px 0 hsl(var(--pixel-dark) / 0.5);
+      4px 4px 0 hsl(var(--valley-deep)),
+      6px 6px 0 hsl(var(--valley-dark) / 0.7);
     background: linear-gradient(135deg,
-      hsl(var(--primary)) 0%,
-      hsl(var(--primary)) 45%,
-      hsl(var(--primary) / 0.8) 50%,
-      hsl(var(--primary)) 55%,
-      hsl(var(--primary)) 100%
+      hsl(var(--valley-forest)) 0%,
+      hsl(var(--valley-forest)) 45%,
+      hsl(var(--valley-moss)) 50%,
+      hsl(var(--valley-forest)) 55%,
+      hsl(var(--valley-forest)) 100%
     );
   }
 
   .pixel-button:hover {
-    transform: translate(-3px, -3px);
+    transform: translate(-2px, -2px);
     box-shadow: 
-      9px 9px 0 hsl(var(--pixel-dark)),
-      12px 12px 0 hsl(var(--pixel-dark) / 0.5);
+      6px 6px 0 hsl(var(--valley-deep)),
+      8px 8px 0 hsl(var(--valley-dark) / 0.7);
   }
 
   .pixel-button:active {
-    transform: translate(3px, 3px);
+    transform: translate(2px, 2px);
     box-shadow: 
-      3px 3px 0 hsl(var(--pixel-dark)),
-      6px 6px 0 hsl(var(--pixel-dark) / 0.5);
+      2px 2px 0 hsl(var(--valley-deep)),
+      4px 4px 0 hsl(var(--valley-dark) / 0.7);
   }
 
-  /* Pixel Progress Bar - Grid of Tiles */
+  /* Valley Progress Bar - Grid of Tiles */
   .pixel-progress {
     display: grid;
     grid-template-columns: repeat(20, 1fr);
     gap: 2px;
     height: 24px;
-    background: hsl(var(--pixel-dark));
+    background: hsl(var(--valley-dark));
     border: 2px solid hsl(var(--border));
     padding: 4px;
   }
 
   .pixel-progress-tile {
-    background: hsl(var(--pixel-charcoal));
-    border: 1px solid hsl(var(--pixel-dark));
+    background: hsl(var(--valley-deep));
+    border: 1px solid hsl(var(--valley-dark));
     transition: all 0.1s step-end;
   }
 
   .pixel-progress-tile.active {
-    background: hsl(var(--pixel-green));
+    background: hsl(var(--valley-forest));
     box-shadow: 
-      0 0 4px hsl(var(--pixel-green)),
-      inset 0 0 2px hsl(var(--pixel-bright));
+      0 0 4px hsl(var(--valley-forest)),
+      inset 0 0 2px hsl(var(--valley-teal));
   }
 
-  /* Neon Text Effects */
+  /* Valley Neon Text Effects */
   .neon-text {
     text-shadow: 
       0 0 5px currentColor,
       0 0 10px currentColor,
       0 0 15px currentColor,
-      0 0 20px currentColor,
-      1px 1px 0 hsl(var(--pixel-dark)),
-      2px 2px 0 hsl(var(--pixel-dark));
-    animation: pixel-glow 2s ease-in-out infinite alternate;
+      1px 1px 0 hsl(var(--valley-dark)),
+      2px 2px 0 hsl(var(--valley-dark));
+    animation: valley-glow 2s ease-in-out infinite alternate;
   }
 
-  /* Jackpot Zone with Scan Lines */
+  /* Jackpot Zone with Valley Theme */
   .jackpot-zone {
     position: relative;
     background: 
       linear-gradient(90deg, 
         transparent 0%, 
-        hsl(var(--pixel-green) / 0.1) 25%,
-        hsl(var(--pixel-green) / 0.3) 50%,
-        hsl(var(--pixel-green) / 0.1) 75%,
+        hsl(var(--valley-forest) / 0.1) 25%,
+        hsl(var(--valley-forest) / 0.3) 50%,
+        hsl(var(--valley-forest) / 0.1) 75%,
         transparent 100%
       );
-    border: 3px solid hsl(var(--pixel-green));
+    border: 3px solid hsl(var(--valley-forest));
     box-shadow: 
-      0 0 20px hsl(var(--pixel-green) / 0.5),
-      inset 0 0 10px hsl(var(--pixel-green) / 0.2);
+      0 0 20px hsl(var(--valley-forest) / 0.5),
+      inset 0 0 10px hsl(var(--valley-forest) / 0.2);
   }
 
   .jackpot-zone::before {
@@ -292,8 +292,8 @@
       repeating-linear-gradient(0deg,
         transparent 0px,
         transparent 2px,
-        hsl(var(--pixel-green) / 0.1) 2px,
-        hsl(var(--pixel-green) / 0.1) 4px
+        hsl(var(--valley-teal) / 0.1) 2px,
+        hsl(var(--valley-teal) / 0.1) 4px
       );
     animation: scan-lines 2s linear infinite;
     pointer-events: none;
@@ -307,10 +307,10 @@
     right: 2px;
     bottom: 2px;
     background: 
-      radial-gradient(circle at 20% 50%, hsl(var(--pixel-bright) / 0.1) 2px, transparent 2px),
-      radial-gradient(circle at 80% 30%, hsl(var(--pixel-bright) / 0.1) 1px, transparent 1px),
-      radial-gradient(circle at 60% 80%, hsl(var(--pixel-bright) / 0.1) 1px, transparent 1px);
-    animation: pixel-sparkles 3s ease-in-out infinite;
+      radial-gradient(circle at 20% 50%, hsl(var(--valley-light) / 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 80% 30%, hsl(var(--valley-teal) / 0.1) 1px, transparent 1px),
+      radial-gradient(circle at 60% 80%, hsl(var(--valley-light) / 0.1) 1px, transparent 1px);
+    animation: valley-sparkles 3s ease-in-out infinite;
     pointer-events: none;
   }
 
@@ -318,82 +318,82 @@
   .game-area {
     background: 
       linear-gradient(135deg, 
-        hsl(var(--pixel-dark)) 0%,
-        hsl(var(--pixel-charcoal)) 25%,
-        hsl(var(--pixel-dark)) 50%,
-        hsl(var(--pixel-charcoal)) 75%,
-        hsl(var(--pixel-dark)) 100%
+        hsl(var(--valley-dark)) 0%,
+        hsl(var(--valley-deep)) 25%,
+        hsl(var(--valley-dark)) 50%,
+        hsl(var(--valley-deep)) 75%,
+        hsl(var(--valley-dark)) 100%
       );
     border: 4px solid hsl(var(--border));
     box-shadow: 
-      8px 8px 0 hsl(var(--pixel-dark)),
-      12px 12px 0 hsl(var(--pixel-dark) / 0.5),
-      inset 0 0 20px hsl(var(--pixel-bright) / 0.1);
+      6px 6px 0 hsl(var(--valley-deep)),
+      8px 8px 0 hsl(var(--valley-dark) / 0.7),
+      inset 0 0 20px hsl(var(--valley-teal) / 0.1);
   }
 
-  /* Retro Card Styling */
+  /* Valley Retro Card Styling */
   .retro-card {
     background: 
       linear-gradient(135deg, 
         hsl(var(--card)) 0%, 
-        hsl(var(--pixel-charcoal)) 50%,
+        hsl(var(--valley-deep)) 50%,
         hsl(var(--card)) 100%
       );
     border: 3px solid hsl(var(--border));
     box-shadow: 
-      6px 6px 0 hsl(var(--pixel-dark)),
-      9px 9px 0 hsl(var(--pixel-dark) / 0.5);
+      4px 4px 0 hsl(var(--valley-deep)),
+      6px 6px 0 hsl(var(--valley-dark) / 0.7);
     backdrop-filter: none;
   }
 
-  /* Tab Styling */
+  /* Valley Tab Styling */
   .pixel-tabs {
     border: 3px solid hsl(var(--border));
-    background: hsl(var(--pixel-charcoal));
+    background: hsl(var(--valley-deep));
     padding: 6px;
   }
 
   .pixel-tab {
     border: 2px solid hsl(var(--border));
-    background: hsl(var(--pixel-dark));
+    background: hsl(var(--valley-dark));
     font-family: 'Press Start 2P', monospace;
     font-size: 8px;
     letter-spacing: 1px;
     padding: 8px 16px;
     transition: all 0.1s step-end;
-    box-shadow: 3px 3px 0 hsl(var(--pixel-dark) / 0.5);
+    box-shadow: 3px 3px 0 hsl(var(--valley-deep) / 0.7);
   }
 
   .pixel-tab:hover {
-    background: hsl(var(--pixel-charcoal));
+    background: hsl(var(--valley-deep));
     transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 hsl(var(--pixel-dark) / 0.5);
+    box-shadow: 4px 4px 0 hsl(var(--valley-deep) / 0.7);
   }
 
   .pixel-tab[data-state="active"] {
-    background: hsl(var(--primary));
+    background: hsl(var(--valley-forest));
     color: hsl(var(--primary-foreground));
     transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 hsl(var(--pixel-dark) / 0.5);
+    box-shadow: 5px 5px 0 hsl(var(--valley-deep) / 0.7);
   }
 }
 
-/* 8-bit Animations */
-@keyframes pixel-glow {
+/* Valley Animations */
+@keyframes valley-glow {
   0% { 
     text-shadow: 
       0 0 5px currentColor,
       0 0 10px currentColor,
-      1px 1px 0 hsl(var(--pixel-dark)),
-      2px 2px 0 hsl(var(--pixel-dark));
+      1px 1px 0 hsl(var(--valley-dark)),
+      2px 2px 0 hsl(var(--valley-dark));
   }
   100% { 
     text-shadow: 
       0 0 10px currentColor,
       0 0 20px currentColor,
       0 0 30px currentColor,
-      1px 1px 0 hsl(var(--pixel-dark)),
-      2px 2px 0 hsl(var(--pixel-dark));
+      1px 1px 0 hsl(var(--valley-dark)),
+      2px 2px 0 hsl(var(--valley-dark));
   }
 }
 
@@ -402,7 +402,7 @@
   100% { transform: translateY(8px); }
 }
 
-@keyframes pixel-sparkles {
+@keyframes valley-sparkles {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.8; }
 }
@@ -414,14 +414,14 @@
 
 @keyframes tile-light-up {
   0% { 
-    background: hsl(var(--pixel-charcoal));
+    background: hsl(var(--valley-deep));
     box-shadow: none;
   }
   100% { 
-    background: hsl(var(--pixel-green));
+    background: hsl(var(--valley-forest));
     box-shadow: 
-      0 0 4px hsl(var(--pixel-green)),
-      inset 0 0 2px hsl(var(--pixel-bright));
+      0 0 4px hsl(var(--valley-forest)),
+      inset 0 0 2px hsl(var(--valley-teal));
   }
 }
 
@@ -434,15 +434,15 @@
 
 .pixel-shadow {
   box-shadow: 
-    3px 3px 0 hsl(var(--pixel-dark)),
-    6px 6px 0 hsl(var(--pixel-dark) / 0.5);
+    3px 3px 0 hsl(var(--valley-deep)),
+    4px 4px 0 hsl(var(--valley-dark) / 0.7);
 }
 
 .pixel-shadow-lg {
   box-shadow: 
-    6px 6px 0 hsl(var(--pixel-dark)),
-    9px 9px 0 hsl(var(--pixel-dark) / 0.5),
-    12px 12px 0 hsl(var(--pixel-dark) / 0.3);
+    4px 4px 0 hsl(var(--valley-deep)),
+    6px 6px 0 hsl(var(--valley-dark) / 0.7),
+    8px 8px 0 hsl(var(--valley-dark) / 0.5);
 }
 
 /* Custom scrollbar */
@@ -451,15 +451,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--pixel-dark));
+  background: hsl(var(--valley-dark));
   border: 2px solid hsl(var(--border));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--pixel-green));
-  border: 2px solid hsl(var(--pixel-dark));
+  background: hsl(var(--valley-forest));
+  border: 2px solid hsl(var(--valley-dark));
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--pixel-aqua));
+  background: hsl(var(--valley-teal));
 }
