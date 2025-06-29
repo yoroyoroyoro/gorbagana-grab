@@ -58,7 +58,7 @@ const GlobalLeaderboardPage = () => {
               BACK TO GAME
             </Link>
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold pixel-font-xl text-teal-300 neon-text">
+          <h1 className="text-2xl md:text-3xl font-bold pixel-font-xl text-teal-300">
             GLOBAL LEADERBOARD
           </h1>
         </div>
