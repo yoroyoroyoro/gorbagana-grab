@@ -72,6 +72,24 @@ const Index = () => {
     }
   }, [isConnected, publicKey]);
 
+  // Update balance every 10 seconds when wallet is connected
+  useEffect(() => {
+    if (!isConnected || !publicKey) return;
+
+    const updateBalance = async () => {
+      try {
+        const pubKey = new PublicKey(publicKey);
+        const balance = await gorConnection.getBalance(pubKey);
+        setGorBalance(balance);
+      } catch (error) {
+        console.error('Failed to update balance:', error);
+      }
+    };
+
+    const interval = setInterval(updateBalance, 10000); // Update every 10 seconds
+    return () => clearInterval(interval);
+  }, [isConnected, publicKey]);
+
   const checkGorBalance = async () => {
     if (!publicKey) return;
     
