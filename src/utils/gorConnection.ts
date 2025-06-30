@@ -91,6 +91,27 @@ export class GorConnection {
     }
   }
 
+  async sendTransactionQuick(transaction: Transaction): Promise<string> {
+    try {
+      console.log('Sending transaction to mempool...');
+      
+      // Send the transaction without waiting for confirmation
+      const signature = await this.connection.sendRawTransaction(transaction.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: 'processed', // Use faster commitment level
+        maxRetries: 1 // Reduce retries for speed
+      });
+      
+      console.log('Transaction sent to mempool with signature:', signature);
+      
+      // Don't wait for confirmation - return immediately
+      return signature;
+    } catch (error) {
+      console.error('Failed to send transaction:', error);
+      throw error;
+    }
+  }
+
   async createGamePaymentTransaction(fromPubkey: PublicKey, amount: number): Promise<Transaction> {
     try {
       console.log('Creating transaction with proper lamports conversion...');
