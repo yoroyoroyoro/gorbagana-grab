@@ -107,17 +107,28 @@ const Index = () => {
     try {
       const fromPubkey = new PublicKey(publicKey);
       
-      // Create the actual payment transaction
+      console.log('Creating payment transaction for 0.05 GOR...');
+      console.log('From:', fromPubkey.toString());
+      console.log('To:', gorConnection.getTreasuryWallet().toString());
+      console.log('Current balance:', gorBalance.toFixed(4), 'GOR');
+      
+      // Create the payment transaction
       const transaction = await gorConnection.createGamePaymentTransaction(fromPubkey, 0.05);
+      
+      console.log('Transaction created, requesting signature...');
       
       // Sign the transaction using the wallet
       const signedTransaction = await signTransaction(transaction);
       
+      console.log('Transaction signed, sending to network...');
+      
       // Send the signed transaction
       const signature = await gorConnection.sendTransaction(signedTransaction, fromPubkey);
       
-      console.log('Payment transaction signature:', signature);
-      toast.success('Payment of 0.05 GOR processed! Game starting...');
+      console.log('Payment transaction successful:', signature);
+      toast.success('Payment of 0.05 GOR processed! Game starting...', {
+        description: `Transaction: ${signature.slice(0, 8)}...${signature.slice(-8)}`
+      });
       
       setIsPlaying(true);
       setCurrentScore(null);
@@ -127,9 +138,18 @@ const Index = () => {
       // Refresh balance after payment
       await checkGorBalance();
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment failed:', error);
-      toast.error('Payment failed. Please try again.');
+      
+      if (error.message?.includes('Insufficient balance')) {
+        toast.error('Insufficient GOR balance. Please add more GOR to your wallet.');
+      } else if (error.message?.includes('User rejected')) {
+        toast.error('Transaction cancelled by user.');
+      } else {
+        toast.error('Payment failed. Please check your balance and try again.', {
+          description: error.message || 'Unknown error occurred'
+        });
+      }
     } finally {
       setIsProcessingPayment(false);
     }
@@ -233,6 +253,9 @@ const Index = () => {
               <p className="text-yellow-300 pixel-font">
                 PROCESSING PAYMENT...
               </p>
+              <p className="text-yellow-500 pixel-font text-sm mt-2">
+                Please confirm the transaction in your wallet
+              </p>
             </div>
           </div>
         )}
@@ -243,6 +266,9 @@ const Index = () => {
             <div className="clean-card border-red-400/50 bg-red-900/30">
               <p className="text-red-300 pixel-font">
                 NEED 0.05 GOR TO PLAY
+              </p>
+              <p className="text-red-500 pixel-font text-sm mt-2">
+                Current balance: {gorBalance.toFixed(4)} GOR
               </p>
             </div>
           </div>

@@ -26,8 +26,8 @@ export class GorConnection {
 
   async sendTransaction(transaction: Transaction, publicKey: PublicKey): Promise<string> {
     try {
-      // Add recent blockhash
-      const { blockhash } = await this.connection.getRecentBlockhash();
+      // Add recent blockhash and set fee payer
+      const { blockhash } = await this.connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
@@ -43,23 +43,40 @@ export class GorConnection {
   }
 
   async createGamePaymentTransaction(fromPubkey: PublicKey, amount: number): Promise<Transaction> {
-    const transaction = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey,
-        toPubkey: GAME_TREASURY_WALLET, // Send to game treasury instead of self
-        lamports: amount * LAMPORTS_PER_SOL, // Convert SOL to lamports
-      })
-    );
+    try {
+      // Verify the sender has sufficient balance
+      const balance = await this.getBalance(fromPubkey);
+      if (balance < amount) {
+        throw new Error(`Insufficient balance. Required: ${amount} GOR, Available: ${balance.toFixed(2)} GOR`);
+      }
 
-    return transaction;
+      // Create the transaction
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey,
+          toPubkey: GAME_TREASURY_WALLET,
+          lamports: Math.floor(amount * LAMPORTS_PER_SOL), // Ensure integer lamports
+        })
+      );
+
+      // Get recent blockhash
+      const { blockhash } = await this.connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = fromPubkey;
+
+      return transaction;
+    } catch (error) {
+      console.error('Failed to create game payment transaction:', error);
+      throw error;
+    }
   }
 
   async createPrizeDistributionTransaction(toPubkey: PublicKey, amount: number): Promise<Transaction> {
     const transaction = new Transaction().add(
       SystemProgram.transfer({
-        fromPubkey: GAME_TREASURY_WALLET, // Send from game treasury
+        fromPubkey: GAME_TREASURY_WALLET,
         toPubkey,
-        lamports: amount * LAMPORTS_PER_SOL, // Convert GOR to lamports
+        lamports: Math.floor(amount * LAMPORTS_PER_SOL), // Ensure integer lamports
       })
     );
 
