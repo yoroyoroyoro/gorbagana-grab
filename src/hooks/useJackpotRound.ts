@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { JackpotSystem } from '@/utils/jackpotSystem';
@@ -16,14 +15,33 @@ export const useJackpotRound = () => {
   const [prizePool, setPrizePool] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(86400);
 
-  // Initialize or get current round
+  // Initialize or get current round and update prize pool
   useEffect(() => {
-    let round = JackpotSystem.getCurrentRound();
-    if (!round) {
-      round = JackpotSystem.initializeRound(0);
-    }
-    setPrizePool(round.prizePool);
-    setTimeRemaining(JackpotSystem.getTimeRemaining(round));
+    const initializeRound = async () => {
+      let round = JackpotSystem.getCurrentRound();
+      if (!round) {
+        const currentBalance = await JackpotSystem.getPrizePool();
+        round = JackpotSystem.initializeRound(currentBalance);
+      }
+      
+      // Always get the latest treasury balance as prize pool
+      const currentPrizePool = await JackpotSystem.getPrizePool();
+      setPrizePool(currentPrizePool);
+      setTimeRemaining(JackpotSystem.getTimeRemaining(round));
+    };
+
+    initializeRound();
+  }, []);
+
+  // Update prize pool every 10 seconds to reflect treasury balance
+  useEffect(() => {
+    const updatePrizePool = async () => {
+      const currentBalance = await JackpotSystem.getPrizePool();
+      setPrizePool(currentBalance);
+    };
+
+    const interval = setInterval(updatePrizePool, 10000); // Update every 10 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const distributePrize = async (winner: { player: string; prize: number; winType: string }) => {
@@ -63,7 +81,7 @@ export const useJackpotRound = () => {
 
   // Timer countdown and round management
   useEffect(() => {
-    const timer = setInterval(() => {
+    const timer = setInterval(async () => {
       const round = JackpotSystem.getCurrentRound();
       if (!round) return;
 
@@ -85,9 +103,10 @@ export const useJackpotRound = () => {
             toast.success('Round ended! No games were played.');
           }
           
-          // Initialize new round and reset everything
-          const newRound = JackpotSystem.initializeRound(0);
-          setPrizePool(newRound.prizePool);
+          // Initialize new round with current treasury balance
+          const currentBalance = await JackpotSystem.getPrizePool();
+          const newRound = JackpotSystem.initializeRound(currentBalance);
+          setPrizePool(currentBalance);
           setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
           
           // Trigger a custom event to notify other components
@@ -99,11 +118,14 @@ export const useJackpotRound = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const addGameToRound = (gameEntry: GameEntry, paymentAmount: number) => {
-    const updatedRound = JackpotSystem.addGameToRound(gameEntry, paymentAmount);
-    setPrizePool(updatedRound.prizePool);
+  const addGameToRound = async (gameEntry: GameEntry, paymentAmount: number) => {
+    const updatedRound = await JackpotSystem.addGameToRound(gameEntry, paymentAmount);
     
-    // If there's a winner (jackpot), distribute the prize automatically
+    // Update prize pool to reflect current treasury balance
+    const currentBalance = await JackpotSystem.getPrizePool();
+    setPrizePool(currentBalance);
+    
+    // If there's a winner (jackpot), distribute ALL treasury funds
     if (updatedRound.winner) {
       distributePrize(updatedRound.winner);
       

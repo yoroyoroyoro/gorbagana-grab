@@ -1,4 +1,3 @@
-
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 // Gorbagana testnet RPC endpoint (HTTPS)
@@ -25,6 +24,16 @@ export class GorConnection {
       return balance / LAMPORTS_PER_SOL;
     } catch (error) {
       console.error('Failed to get balance:', error);
+      throw error;
+    }
+  }
+
+  async getTreasuryBalance(): Promise<number> {
+    try {
+      const balance = await this.connection.getBalance(GAME_TREASURY_WALLET);
+      return balance / LAMPORTS_PER_SOL;
+    } catch (error) {
+      console.error('Failed to get treasury balance:', error);
       throw error;
     }
   }
@@ -61,7 +70,7 @@ export class GorConnection {
           
           try {
             // Check treasury balance to see if it increased
-            const treasuryBalance = await this.getBalance(GAME_TREASURY_WALLET);
+            const treasuryBalance = await this.getTreasuryBalance();
             console.log('Treasury balance after transaction:', treasuryBalance);
             
             // If we can get the balance, assume transaction was processed

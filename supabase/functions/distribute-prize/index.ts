@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Connection, Keypair, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from 'https://esm.sh/@solana/web3.js@1.98.2'
@@ -25,7 +24,7 @@ serve(async (req) => {
     console.log('Prize distribution request:', { winner_wallet, prize_amount, game_id });
 
     // Validate input
-    if (!winner_wallet || !prize_amount || !game_id) {
+    if (!winner_wallet || !game_id) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -37,7 +36,7 @@ serve(async (req) => {
       .from('prize_distributions')
       .insert({
         winner_wallet,
-        prize_amount,
+        prize_amount: prize_amount || 0,
         game_id,
         status: 'pending'
       })
@@ -98,23 +97,15 @@ serve(async (req) => {
       );
     }
 
-    // Create transaction with proper size management
-    const winnerPubkey = new PublicKey(winner_wallet);
-    const lamports = Math.floor(prize_amount * LAMPORTS_PER_SOL);
-
-    console.log('Creating transaction:', {
-      from: treasuryKeypair.publicKey.toString(),
-      to: winner_wallet,
-      lamports: lamports,
-      sol: prize_amount
-    });
-
-    // Check treasury balance first
+    // Get ALL treasury balance (minus transaction fee)
     const treasuryBalance = await connection.getBalance(treasuryKeypair.publicKey);
     console.log('Treasury balance:', treasuryBalance / LAMPORTS_PER_SOL, 'SOL');
 
-    if (treasuryBalance < lamports + 5000) { // 5000 lamports for transaction fee
-      console.error('Insufficient treasury balance');
+    const transactionFee = 5000; // 5000 lamports for transaction fee
+    const lamportsToSend = treasuryBalance - transactionFee;
+
+    if (lamportsToSend <= 0) {
+      console.error('Insufficient treasury balance for transaction');
       await supabaseClient
         .from('prize_distributions')
         .update({ status: 'failed' })
@@ -126,11 +117,16 @@ serve(async (req) => {
       );
     }
 
+    const actualPrizeAmount = lamportsToSend / LAMPORTS_PER_SOL;
+    console.log('Sending ALL treasury funds:', actualPrizeAmount, 'SOL');
+
+    // Create transaction to send ALL treasury funds
+    const winnerPubkey = new PublicKey(winner_wallet);
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: treasuryKeypair.publicKey,
         toPubkey: winnerPubkey,
-        lamports: lamports,
+        lamports: lamportsToSend,
       })
     );
 
@@ -195,12 +191,13 @@ serve(async (req) => {
       // Continue anyway as the transaction might still be processed
     }
 
-    // Update prize distribution record
+    // Update prize distribution record with actual amount sent
     const { error: updateError } = await supabaseClient
       .from('prize_distributions')
       .update({
         status: 'completed',
         transaction_signature: signature,
+        prize_amount: actualPrizeAmount,
         completed_at: new Date().toISOString()
       })
       .eq('id', prizeRecord.id);
@@ -213,7 +210,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         transaction_signature: signature,
-        prize_distribution_id: prizeRecord.id
+        prize_distribution_id: prizeRecord.id,
+        actual_prize_amount: actualPrizeAmount
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

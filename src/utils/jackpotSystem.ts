@@ -1,3 +1,5 @@
+import { gorConnection } from './gorConnection';
+
 interface GameEntry {
   id: string;
   player: string;
@@ -41,6 +43,15 @@ export class JackpotSystem {
     return round;
   }
 
+  static async getPrizePool(): Promise<number> {
+    try {
+      return await gorConnection.getTreasuryBalance();
+    } catch (error) {
+      console.error('Failed to get treasury balance for prize pool:', error);
+      return 0;
+    }
+  }
+
   static initializeRound(initialPrizePool: number = 0): RoundData {
     const now = new Date();
     const round: RoundData = {
@@ -55,7 +66,7 @@ export class JackpotSystem {
     return round;
   }
 
-  static addGameToRound(game: GameEntry, paymentAmount: number): RoundData {
+  static async addGameToRound(game: GameEntry, paymentAmount: number): Promise<RoundData> {
     let round = this.getCurrentRound();
     
     if (!round || this.isRoundExpired(round)) {
@@ -63,11 +74,12 @@ export class JackpotSystem {
       if (round) {
         this.endRound(round);
       }
-      // Start new round
-      round = this.initializeRound(paymentAmount);
+      // Start new round with current treasury balance
+      const currentBalance = await this.getPrizePool();
+      round = this.initializeRound(currentBalance);
     } else {
-      // Add to existing round
-      round.prizePool += paymentAmount;
+      // Update prize pool to current treasury balance
+      round.prizePool = await this.getPrizePool();
     }
 
     // Add game to round
@@ -75,11 +87,13 @@ export class JackpotSystem {
     
     // Check for instant jackpot
     if (game.score === 100) {
-      game.prize = round.prizePool;
+      // Award ALL treasury funds to jackpot winner
+      const treasuryBalance = await this.getPrizePool();
+      game.prize = treasuryBalance;
       round.winner = {
         player: game.player,
         score: game.score,
-        prize: round.prizePool,
+        prize: treasuryBalance,
         winType: 'jackpot'
       };
       
@@ -102,7 +116,7 @@ export class JackpotSystem {
     return Math.max(0, Math.floor(remaining / 1000));
   }
 
-  static endRound(round: RoundData): RoundData {
+  static async endRound(round: RoundData): Promise<RoundData> {
     if (!round.winner && round.games.length > 0) {
       // Find highest score(s)
       const highestScore = Math.max(...round.games.map(g => g.score));
@@ -114,11 +128,13 @@ export class JackpotSystem {
           current.timestamp < earliest.timestamp ? current : earliest
         );
         
-        winner.prize = round.prizePool;
+        // Award ALL treasury funds to round winner
+        const treasuryBalance = await this.getPrizePool();
+        winner.prize = treasuryBalance;
         round.winner = {
           player: winner.player,
           score: winner.score,
-          prize: round.prizePool,
+          prize: treasuryBalance,
           winType: 'highest_score'
         };
 
