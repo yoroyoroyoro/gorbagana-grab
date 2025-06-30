@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import GameArea from '@/components/GameArea';
@@ -96,8 +97,8 @@ const Index = () => {
       return;
     }
 
-    if (gorBalance < 0.05) {
-      toast.error('Insufficient balance. You need at least 0.05 SOL to play.');
+    if (gorBalance < 0.06) { // Increased buffer to account for fees
+      toast.error('Insufficient balance. You need at least 0.06 SOL to play (including transaction fees).');
       return;
     }
 
@@ -121,29 +122,40 @@ const Index = () => {
       
       console.log('Transaction signed, sending to network...');
       
-      // Send the signed transaction
+      // Send the signed transaction (now handles timeouts gracefully)
       const signature = await gorConnection.sendTransaction(signedTransaction, fromPubkey);
       
-      console.log('Payment transaction successful:', signature);
+      console.log('Payment transaction completed:', signature);
+      
+      // Show success message regardless of confirmation timeout
       toast.success('Payment of 0.05 SOL processed! Game starting...', {
         description: `Transaction: ${signature.slice(0, 8)}...${signature.slice(-8)}`
       });
       
+      // Start the game immediately - don't wait for perfect confirmation
       setIsPlaying(true);
       setCurrentScore(null);
       
       updateStatsForGame(0, 0); // Just increment games played
       
-      // Refresh balance after payment
-      await checkGorBalance();
+      // Refresh balance after a short delay to allow network to process
+      setTimeout(() => {
+        checkGorBalance();
+      }, 3000);
       
     } catch (error: any) {
       console.error('Payment failed:', error);
       
+      // Handle specific error types more gracefully
       if (error.message?.includes('Insufficient balance')) {
         toast.error('Insufficient balance. Please add more SOL to your wallet.');
-      } else if (error.message?.includes('User rejected')) {
+      } else if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
         toast.error('Transaction cancelled by user.');
+      } else if (error.name === 'TransactionExpiredTimeoutError' || error.message?.includes('timeout')) {
+        // For timeout errors, show a different message and suggest checking manually
+        toast.error('Transaction may have succeeded but confirmation timed out. Check your balance and try again if needed.', {
+          description: 'Sometimes transactions take longer to confirm on the network.'
+        });
       } else {
         toast.error('Payment failed. Please check your balance and try again.', {
           description: error.message || 'Unknown error occurred'
