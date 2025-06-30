@@ -223,36 +223,41 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Navigation Pills - Responsive positioning */}
-      <div className="absolute top-2 sm:top-6 right-2 sm:right-6 z-20">
-        <NavigationPills 
-          isConnected={isConnected}
-          publicKey={publicKey}
-          onConnect={handleConnectWallet}
-          onDisconnect={handleDisconnectWallet}
-        />
-      </div>
-
-      {/* Session Leaderboard - Responsive positioning */}
-      <div className="absolute top-16 sm:top-20 right-2 sm:right-6 z-20">
-        <SessionLeaderboard players={sessionLeaderboard} />
-      </div>
-      
-      <div className="relative z-10 container mx-auto px-2 sm:px-4 py-4 sm:py-20 max-w-6xl">
+      <div className="relative z-10 container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-6xl">
+        {/* Top Navigation Bar - Fixed positioning to avoid overlap */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex-1"></div>
+          
+          {/* Navigation Pills - Now in the flow */}
+          <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 sm:gap-4 items-center">
+            <NavigationPills 
+              isConnected={isConnected}
+              publicKey={publicKey}
+              onConnect={handleConnectWallet}
+              onDisconnect={handleDisconnectWallet}
+            />
+            
+            {/* Session Leaderboard - Now inline on mobile */}
+            <div className="w-full sm:w-auto">
+              <SessionLeaderboard players={sessionLeaderboard} />
+            </div>
+          </div>
+        </div>
+        
         {/* Header */}
-        <div className="text-center mb-4">
-          <div className="flex justify-center items-center gap-2 sm:gap-6 mb-2">
+        <div className="text-center mb-6">
+          <div className="flex justify-center items-center gap-2 sm:gap-6 mb-4">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 
-              className="w-auto h-48 sm:h-64 md:h-80 lg:h-96 pixel-art"
+              className="w-auto h-32 sm:h-48 md:h-64 lg:h-80 pixel-art"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
               }}
             />
           </div>
 
-          {/* Game Stats - Responsive grid */}
+          {/* Game Stats */}
           <div className="mb-6">
             <GameStats 
               prizePool={prizePool}
@@ -264,7 +269,7 @@ const Index = () => {
         </div>
 
         {/* Game Area */}
-        <div className="mb-4">
+        <div className="mb-6">
           <GameArea
             isPlaying={isPlaying}
             onStop={handleGameStop}
@@ -275,12 +280,12 @@ const Index = () => {
 
         {/* Processing Payment */}
         {isProcessingPayment && (
-          <div className="text-center mt-4 sm:mt-8 px-2">
+          <div className="text-center mb-6 px-2">
             <div className="clean-card border-yellow-400/50 bg-yellow-900/30">
-              <p className="text-yellow-300 pixel-font">
+              <p className="text-yellow-300 pixel-font text-xs sm:text-sm">
                 PROCESSING PAYMENT...
               </p>
-              <p className="text-yellow-500 pixel-font text-sm mt-2">
+              <p className="text-yellow-500 pixel-font text-xs mt-2">
                 Please confirm the transaction in your wallet
               </p>
             </div>
@@ -289,12 +294,12 @@ const Index = () => {
 
         {/* Balance Warning */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
-          <div className="text-center mt-4 sm:mt-8 px-2">
+          <div className="text-center px-2">
             <div className="clean-card border-red-400/50 bg-red-900/30">
-              <p className="text-red-300 pixel-font">
+              <p className="text-red-300 pixel-font text-xs sm:text-sm">
                 NEED 0.05 SOL TO PLAY
               </p>
-              <p className="text-red-500 pixel-font text-sm mt-2">
+              <p className="text-red-500 pixel-font text-xs mt-2">
                 Current balance: {gorBalance.toFixed(4)} SOL
               </p>
             </div>
