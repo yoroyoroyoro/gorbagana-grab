@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -97,11 +96,17 @@ const Index = () => {
             toast.success('Round ended! No games were played.');
           }
           
-          // Reset session leaderboard for new round
+          // Initialize new round and reset everything
           const newRound = JackpotSystem.initializeRound(0);
           setPrizePool(newRound.prizePool);
           setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
-          resetSessionLeaderboard(newRound.roundId);
+          // Clear session leaderboard immediately
+          setSessionLeaderboard([]);
+          // Clear old leaderboard data from localStorage
+          const oldRoundId = round?.roundId;
+          if (oldRoundId) {
+            localStorage.removeItem(`sessionLeaderboard_${oldRoundId}`);
+          }
         }
       }
     }, 1000);
@@ -130,15 +135,6 @@ const Index = () => {
       setSessionLeaderboard(leaderboard);
     } else {
       setSessionLeaderboard([]);
-    }
-  };
-
-  const resetSessionLeaderboard = (newRoundId: string) => {
-    setSessionLeaderboard([]);
-    // Clear old leaderboard data
-    const round = JackpotSystem.getCurrentRound();
-    if (round) {
-      localStorage.removeItem(`sessionLeaderboard_${round.roundId}`);
     }
   };
 
@@ -298,12 +294,13 @@ const Index = () => {
       };
       savePlayerStats(updatedStats);
       
-      // Reset session leaderboard for new round
+      // Clear session leaderboard immediately on jackpot
+      setSessionLeaderboard([]);
+      // Clear from localStorage
+      localStorage.removeItem(`sessionLeaderboard_${updatedRound.roundId}`);
+      
+      // Reset time for new round
       setTimeRemaining(86400);
-      const newRound = JackpotSystem.getCurrentRound();
-      if (newRound) {
-        resetSessionLeaderboard(newRound.roundId);
-      }
     } else {
       const updatedStats = {
         ...playerStats,
