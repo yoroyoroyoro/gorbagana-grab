@@ -12,6 +12,7 @@ interface GameAreaProps {
 const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) => {
   const [cursorPosition, setCursorPosition] = useState(0);
   const [gameScore, setGameScore] = useState<number | null>(null);
+  const [currentLiveScore, setCurrentLiveScore] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout>();
 
   // Cursor sweep animation
@@ -35,11 +36,17 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         }
         
         setCursorPosition(position);
+        
+        // Calculate live score based on distance from center (50%)
+        const distanceFromCenter = Math.abs(position - 50);
+        const liveScore = Math.max(0, Math.round(100 - (distanceFromCenter * 2)));
+        setCurrentLiveScore(liveScore);
       }, 16); // ~60fps
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      setCurrentLiveScore(0);
     }
 
     return () => {
@@ -124,7 +131,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         </div>
 
         {/* Game Controls */}
-        <div className="text-center">
+        <div className="text-center flex items-center justify-center gap-6">
           {!isPlaying ? (
             <Button
               onClick={onStartGame}
@@ -134,12 +141,24 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
               {canPlay ? 'PAY 0.05 GOR & PLAY' : 'NEED WALLET & GOR'}
             </Button>
           ) : (
-            <Button
-              onClick={handleStop}
-              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-4 px-8 pixel-font border-2 border-red-400/60"
-            >
-              HIT THE TRASH!
-            </Button>
+            <>
+              <Button
+                onClick={handleStop}
+                className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-4 px-8 pixel-font border-2 border-red-400/60"
+              >
+                HIT THE TRASH!
+              </Button>
+              
+              {/* Score Fluctuator */}
+              <div className="clean-card">
+                <div className={`text-3xl font-bold ${getScoreColor(currentLiveScore)} pixel-font transition-colors duration-100`}>
+                  {currentLiveScore}
+                </div>
+                <div className="text-xs text-slate-400 pixel-font">
+                  LIVE SCORE
+                </div>
+              </div>
+            </>
           )}
         </div>
 

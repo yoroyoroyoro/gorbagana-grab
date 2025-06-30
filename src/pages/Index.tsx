@@ -100,13 +100,9 @@ const Index = () => {
           const newRound = JackpotSystem.initializeRound(0);
           setPrizePool(newRound.prizePool);
           setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
-          // Clear session leaderboard immediately
+          // Clear session leaderboard immediately and from localStorage
           setSessionLeaderboard([]);
-          // Clear old leaderboard data from localStorage
-          const oldRoundId = round?.roundId;
-          if (oldRoundId) {
-            localStorage.removeItem(`sessionLeaderboard_${oldRoundId}`);
-          }
+          localStorage.removeItem(`sessionLeaderboard_${round.roundId}`);
         }
       }
     }, 1000);
@@ -274,11 +270,11 @@ const Index = () => {
       prize: 0
     };
 
-    // Get current round ID before adding the game (in case it triggers a jackpot)
+    // Get current round and its ID before adding the game
     const currentRound = JackpotSystem.getCurrentRound();
     const currentRoundId = currentRound?.roundId;
 
-    // Update session leaderboard first (before potential jackpot reset)
+    // Update session leaderboard first
     updateSessionLeaderboard(publicKey!, score);
 
     // Add game to jackpot system
@@ -298,7 +294,7 @@ const Index = () => {
       };
       savePlayerStats(updatedStats);
       
-      // Clear session leaderboard immediately on jackpot using the OLD round ID
+      // JACKPOT RESET: Clear session leaderboard completely
       setSessionLeaderboard([]);
       if (currentRoundId) {
         localStorage.removeItem(`sessionLeaderboard_${currentRoundId}`);
@@ -441,7 +437,7 @@ const Index = () => {
         <Dialog open={isHelpModalOpen} onOpenChange={setIsHelpModalOpen}>
           <DialogTrigger asChild>
             <div className="relative cursor-pointer group">
-              {/* Help Icon - Made more obvious for clicking */}
+              {/* Help Icon - Removed the dot indicator */}
               <div className="w-32 h-32 hover:scale-110 transition-transform duration-200 cursor-pointer">
                 <img 
                   src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
@@ -451,10 +447,6 @@ const Index = () => {
                     filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
                   }}
                 />
-                {/* Click indicator */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-400 rounded-full animate-pulse flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
               </div>
             </div>
           </DialogTrigger>
