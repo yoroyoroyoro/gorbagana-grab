@@ -105,7 +105,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
             <div 
               className="absolute top-1 w-20 h-20 transition-none z-20 flex items-center justify-center"
               style={{ 
-                left: `calc(${Math.max(10, Math.min(cursorPosition, 90))}% - 40px)`, // Keep character within bounds (10% to 90% range)
+                left: `calc(${Math.max(5, Math.min(cursorPosition, 95))}% - 40px)`, // Allow closer to edges but prevent cutoff
                 filter: 'drop-shadow(0 0 10px rgba(32, 178, 170, 0.8))'
               }}
             >
