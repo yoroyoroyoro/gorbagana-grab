@@ -47,28 +47,37 @@ export const useJackpotRound = () => {
 
   const distributePrize = async (winner: { player: string; prize: number; winType: string }) => {
     try {
-      console.log(`Distributing ${winner.prize.toFixed(2)} GOR to ${winner.player}`);
+      console.log(`Distributing ${winner.prize.toFixed(2)} SOL to ${winner.player}`);
       
       // Call the edge function to distribute the prize
       const { data, error } = await supabase.functions.invoke('distribute-prize', {
         body: {
           winner_wallet: winner.player,
           prize_amount: winner.prize,
-          game_id: `${Date.now()}-${winner.player.slice(-6)}`
+          game_id: `jackpot-${Date.now()}-${winner.player.slice(-6)}`,
+          win_type: winner.winType
         }
       });
 
       if (error) {
-        console.error('Prize distribution failed:', error);
-        toast.error('Failed to distribute prize automatically. Please contact support.');
+        console.error('Prize distribution call failed:', error);
+        toast.error('Failed to distribute prize automatically. Please contact support.', {
+          description: `Error: ${error.message}`
+        });
         return;
       }
 
       if (data?.success) {
         console.log(`Prize distributed successfully! Transaction: ${data.transaction_signature}`);
-        toast.success(`Prize distributed! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} received ${winner.prize.toFixed(2)} GOR!`, {
-          description: `Transaction: ${data.transaction_signature.slice(0, 8)}...${data.transaction_signature.slice(-8)}`
+        toast.success(`🎉 JACKPOT PRIZE DISTRIBUTED! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} received ${data.actual_prize_amount?.toFixed(2) || winner.prize.toFixed(2)} SOL!`, {
+          description: `Transaction: ${data.transaction_signature.slice(0, 8)}...${data.transaction_signature.slice(-8)}`,
+          duration: 10000
         });
+        
+        // Update prize pool to reflect the distribution
+        setTimeout(() => {
+          setPrizePool(0); // Treasury should be empty after full distribution
+        }, 2000);
       } else {
         console.error('Prize distribution failed:', data);
         toast.error('Failed to distribute prize automatically. Please contact support.');
@@ -102,16 +111,17 @@ export const useJackpotRound = () => {
             };
             
             toast.success(
-              `Round ended! ${winnerWithPrize.player.slice(0, 6)}...${winnerWithPrize.player.slice(-4)} won ${winnerWithPrize.prize.toFixed(2)} GOR with score ${winnerWithPrize.score}!`
+              `⏰ ROUND ENDED! ${winnerWithPrize.player.slice(0, 6)}...${winnerWithPrize.player.slice(-4)} won ${winnerWithPrize.prize.toFixed(2)} SOL with score ${winnerWithPrize.score}!`,
+              { duration: 8000 }
             );
             
             // Distribute the prize automatically
-            distributePrize(winnerWithPrize);
+            await distributePrize(winnerWithPrize);
           } else {
             toast.success('Round ended! No games were played.');
           }
           
-          // Initialize new round with current treasury balance
+          // Initialize new round with current treasury balance (should be 0 after distribution)
           const currentBalance = await JackpotSystem.getPrizePool();
           const newRound = JackpotSystem.initializeRound(currentBalance);
           setPrizePool(currentBalance);
@@ -139,7 +149,11 @@ export const useJackpotRound = () => {
         ...updatedRound.winner,
         prize: currentBalance
       };
-      distributePrize(winnerWithCurrentPrize);
+      
+      console.log('JACKPOT HIT! Distributing prize:', winnerWithCurrentPrize);
+      
+      // Distribute the prize immediately
+      await distributePrize(winnerWithCurrentPrize);
       
       // Trigger a custom event to notify other components about jackpot
       window.dispatchEvent(new CustomEvent('jackpotWon', { detail: winnerWithCurrentPrize }));

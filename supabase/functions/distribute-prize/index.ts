@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Connection, Keypair, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from 'https://esm.sh/@solana/web3.js@1.98.2'
@@ -19,12 +20,13 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { winner_wallet, prize_amount, game_id } = await req.json();
+    const { winner_wallet, prize_amount, game_id, win_type } = await req.json();
 
-    console.log('Prize distribution request:', { winner_wallet, prize_amount, game_id });
+    console.log('Prize distribution request:', { winner_wallet, prize_amount, game_id, win_type });
 
     // Validate input
     if (!winner_wallet || !game_id) {
+      console.error('Missing required fields');
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -53,17 +55,17 @@ serve(async (req) => {
 
     console.log('Prize record created:', prizeRecord.id);
 
-    // Setup Solana connection with retry logic
+    // Setup Solana connection
     const connection = new Connection('https://rpc.gorbagana.wtf/', {
       commitment: 'confirmed',
-      confirmTransactionInitialTimeout: 60000,
-      wsEndpoint: undefined // Disable WebSocket to avoid connection issues
+      confirmTransactionInitialTimeout: 30000,
+      wsEndpoint: undefined
     });
     
     // Get treasury private key from environment
     const treasuryPrivateKey = Deno.env.get('TREASURY_PRIVATE_KEY');
     if (!treasuryPrivateKey) {
-      console.error('Treasury private key not found');
+      console.error('Treasury private key not found in environment');
       await supabaseClient
         .from('prize_distributions')
         .update({ status: 'failed' })
@@ -118,7 +120,7 @@ serve(async (req) => {
     }
 
     const actualPrizeAmount = lamportsToSend / LAMPORTS_PER_SOL;
-    console.log('Sending ALL treasury funds:', actualPrizeAmount, 'SOL');
+    console.log('Sending ALL treasury funds:', actualPrizeAmount, 'SOL to', winner_wallet);
 
     // Create transaction to send ALL treasury funds
     const winnerPubkey = new PublicKey(winner_wallet);
@@ -130,25 +132,9 @@ serve(async (req) => {
       })
     );
 
-    // Get recent blockhash with retry
-    let recentBlockhash;
-    let attempts = 0;
-    const maxAttempts = 3;
-    
-    while (attempts < maxAttempts) {
-      try {
-        const result = await connection.getLatestBlockhash('confirmed');
-        recentBlockhash = result.blockhash;
-        break;
-      } catch (blockchashError) {
-        attempts++;
-        console.warn(`Blockhash attempt ${attempts} failed:`, blockchashError);
-        if (attempts === maxAttempts) throw blockchashError;
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
-      }
-    }
-
-    transaction.recentBlockhash = recentBlockhash!;
+    // Get recent blockhash
+    const { blockhash } = await connection.getLatestBlockhash('confirmed');
+    transaction.recentBlockhash = blockhash;
     transaction.feePayer = treasuryKeypair.publicKey;
 
     // Sign transaction
@@ -156,32 +142,16 @@ serve(async (req) => {
     
     console.log('Transaction signed, sending to network...');
 
-    // Send transaction with retry logic
-    let signature: string | undefined;
-    attempts = 0;
+    // Send transaction
+    const signature = await connection.sendRawTransaction(transaction.serialize(), {
+      skipPreflight: false,
+      preflightCommitment: 'confirmed',
+      maxRetries: 3
+    });
     
-    while (attempts < maxAttempts) {
-      try {
-        signature = await connection.sendRawTransaction(transaction.serialize(), {
-          skipPreflight: false,
-          preflightCommitment: 'confirmed',
-          maxRetries: 3
-        });
-        console.log('Transaction sent:', signature);
-        break;
-      } catch (sendError) {
-        attempts++;
-        console.warn(`Send attempt ${attempts} failed:`, sendError);
-        if (attempts === maxAttempts) throw sendError;
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retry
-      }
-    }
+    console.log('Transaction sent:', signature);
 
-    if (!signature) {
-      throw new Error('Failed to send transaction after retries');
-    }
-
-    // Confirm transaction with timeout
+    // Confirm transaction
     console.log('Confirming transaction...');
     try {
       await connection.confirmTransaction(signature, 'confirmed');
@@ -205,6 +175,8 @@ serve(async (req) => {
     if (updateError) {
       console.error('Failed to update prize record:', updateError);
     }
+
+    console.log('Prize distribution completed successfully!');
 
     return new Response(
       JSON.stringify({ 
