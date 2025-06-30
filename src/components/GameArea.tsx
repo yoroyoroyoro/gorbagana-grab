@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -19,6 +18,8 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
   useEffect(() => {
     if (isPlaying) {
       setGameScore(null);
+      // Always start cursor at position 0 (left side)
+      setCursorPosition(0);
       const startTime = Date.now();
       
       intervalRef.current = setInterval(() => {
@@ -47,6 +48,8 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
         clearInterval(intervalRef.current);
       }
       setCurrentLiveScore(0);
+      // Reset cursor to starting position when not playing
+      setCursorPosition(0);
     }
 
     return () => {
@@ -97,7 +100,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
           </div>
 
           {/* Moving Pixel Character Cursor */}
-          {isPlaying && (
+          {(isPlaying || (!isPlaying && cursorPosition === 0)) && (
             <div 
               className="absolute top-1 w-20 h-20 transition-none z-20 flex items-center justify-center"
               style={{ 
