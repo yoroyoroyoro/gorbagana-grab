@@ -100,12 +100,12 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
             />
           </div>
 
-          {/* Moving Pixel Character Cursor - Responsive sizing */}
+          {/* Moving Pixel Character Cursor - Responsive sizing with closer edge positioning */}
           {(isPlaying || (!isPlaying && cursorPosition === 0)) && (
             <div 
               className="absolute top-0 sm:top-0.5 lg:top-1 w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 transition-none z-20 flex items-center justify-center"
               style={{ 
-                left: `calc(${Math.max(5, Math.min(cursorPosition, 95))}% - ${7 * (window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 1.14 : 1.28)}px)`,
+                left: `calc(${Math.max(2, Math.min(cursorPosition, 98))}% - ${7 * (window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 1.14 : 1.28)}px)`,
                 filter: 'drop-shadow(0 0 10px rgba(32, 178, 170, 0.8))'
               }}
             >
