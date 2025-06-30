@@ -39,7 +39,7 @@ export class GorConnection {
     }
   }
 
-  async createGamePaymentTransaction(fromPubkey: PublicKey, toPubkey: PublicKey, amount: number): Transaction {
+  async createGamePaymentTransaction(fromPubkey: PublicKey, toPubkey: PublicKey, amount: number): Promise<Transaction> {
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey,
