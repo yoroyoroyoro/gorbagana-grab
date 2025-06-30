@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { JackpotSystem } from '@/utils/jackpotSystem';
-import { gorConnection } from '@/utils/gorConnection';
-import { PublicKey } from '@solana/web3.js';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GameEntry {
   id: string;
@@ -31,27 +30,34 @@ export const useJackpotRound = () => {
     try {
       console.log(`Distributing ${winner.prize.toFixed(2)} GOR to ${winner.player}`);
       
-      // In a real implementation, you would:
-      // 1. Create a transaction to send GOR from jackpot wallet to winner's wallet
-      // 2. Sign and send the transaction
-      // 3. Confirm the transaction
-      
-      // For now, we'll simulate the distribution
-      const winnerPubkey = new PublicKey(winner.player);
-      
-      // This would be the actual prize distribution logic:
-      // const transaction = await gorConnection.createPrizeDistributionTransaction(
-      //   jackpotWalletPubkey, // The jackpot wallet that holds the prize pool
-      //   winnerPubkey,        // Winner's wallet
-      //   winner.prize         // Prize amount in GOR
-      // );
-      
-      console.log(`Prize of ${winner.prize.toFixed(2)} GOR distributed to ${winner.player}`);
-      toast.success(`Prize distributed! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} received ${winner.prize.toFixed(2)} GOR!`);
+      // Call the edge function to distribute the prize
+      const { data, error } = await supabase.functions.invoke('distribute-prize', {
+        body: {
+          winner_wallet: winner.player,
+          prize_amount: winner.prize,
+          game_id: `${Date.now()}-${winner.player.slice(-6)}`
+        }
+      });
+
+      if (error) {
+        console.error('Prize distribution failed:', error);
+        toast.error('Failed to distribute prize automatically. Please contact support.');
+        return;
+      }
+
+      if (data?.success) {
+        console.log(`Prize distributed successfully! Transaction: ${data.transaction_signature}`);
+        toast.success(`Prize distributed! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} received ${winner.prize.toFixed(2)} GOR!`, {
+          description: `Transaction: ${data.transaction_signature.slice(0, 8)}...${data.transaction_signature.slice(-8)}`
+        });
+      } else {
+        console.error('Prize distribution failed:', data);
+        toast.error('Failed to distribute prize automatically. Please contact support.');
+      }
       
     } catch (error) {
       console.error('Failed to distribute prize:', error);
-      toast.error('Failed to distribute prize. Please contact support.');
+      toast.error('Failed to distribute prize automatically. Please contact support.');
     }
   };
 
@@ -73,7 +79,7 @@ export const useJackpotRound = () => {
               `Round ended! ${result.winner.player.slice(0, 6)}...${result.winner.player.slice(-4)} won ${result.winner.prize.toFixed(2)} GOR with score ${result.winner.score}!`
             );
             
-            // Distribute the prize
+            // Distribute the prize automatically
             distributePrize(result.winner);
           } else {
             toast.success('Round ended! No games were played.');
@@ -97,7 +103,7 @@ export const useJackpotRound = () => {
     const updatedRound = JackpotSystem.addGameToRound(gameEntry, paymentAmount);
     setPrizePool(updatedRound.prizePool);
     
-    // If there's a winner (jackpot), distribute the prize
+    // If there's a winner (jackpot), distribute the prize automatically
     if (updatedRound.winner) {
       distributePrize(updatedRound.winner);
       
