@@ -371,6 +371,11 @@ const Index = () => {
           )}
         </div>
       </div>
+
+      {/* Session Leaderboard - Vertical Rectangle under Navigation */}
+      <div className="absolute top-20 right-6 z-20">
+        <SessionLeaderboard players={sessionLeaderboard} />
+      </div>
       
       <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
         {/* Header */}
@@ -417,11 +422,6 @@ const Index = () => {
           />
         </div>
 
-        {/* Session Leaderboard */}
-        <div className="mb-8">
-          <SessionLeaderboard players={sessionLeaderboard} />
-        </div>
-
         {/* Balance Warning */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
           <div className="text-center mt-8">
@@ -439,16 +439,20 @@ const Index = () => {
         <Dialog open={isHelpModalOpen} onOpenChange={setIsHelpModalOpen}>
           <DialogTrigger asChild>
             <div className="relative cursor-pointer group">
-              {/* Help Icon - Made bigger with glow effect and bounce animation */}
-              <div className="w-32 h-32 hover:scale-110 transition-transform duration-200 animate-bounce">
+              {/* Help Icon - Made more obvious for clicking */}
+              <div className="w-32 h-32 hover:scale-110 transition-transform duration-200 cursor-pointer">
                 <img 
                   src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
                   alt="Help Character" 
-                  className="w-full h-full pixel-art"
+                  className="w-full h-full pixel-art hover:brightness-125 transition-all duration-200"
                   style={{
                     filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
                   }}
                 />
+                {/* Click indicator */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-400 rounded-full animate-pulse flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                </div>
               </div>
             </div>
           </DialogTrigger>
