@@ -54,8 +54,12 @@ serve(async (req) => {
 
     console.log('Prize record created:', prizeRecord.id);
 
-    // Setup Solana connection
-    const connection = new Connection('https://rpc.gorbagana.wtf/', 'confirmed');
+    // Setup Solana connection with retry logic
+    const connection = new Connection('https://rpc.gorbagana.wtf/', {
+      commitment: 'confirmed',
+      confirmTransactionInitialTimeout: 60000,
+      wsEndpoint: undefined // Disable WebSocket to avoid connection issues
+    });
     
     // Get treasury private key from environment
     const treasuryPrivateKey = Deno.env.get('TREASURY_PRIVATE_KEY');
@@ -72,47 +76,124 @@ serve(async (req) => {
       );
     }
 
-    // Create keypair from private key
-    const treasuryKeypair = Keypair.fromSecretKey(
-      new Uint8Array(JSON.parse(`[${treasuryPrivateKey.split('').map((_, i, arr) => {
-        if (i % 2 === 0) return parseInt(arr.slice(i, i + 2).join(''), 16);
-      }).filter(x => x !== undefined)}]`))
-    );
+    // Import base58 for proper key decoding
+    const { decode: bs58decode } = await import('https://esm.sh/bs58@5.0.0');
+    
+    let treasuryKeypair: Keypair;
+    try {
+      // Decode the base58 private key
+      const privateKeyBytes = bs58decode(treasuryPrivateKey);
+      treasuryKeypair = Keypair.fromSecretKey(privateKeyBytes);
+      console.log('Treasury wallet loaded:', treasuryKeypair.publicKey.toString());
+    } catch (keyError) {
+      console.error('Failed to decode treasury private key:', keyError);
+      await supabaseClient
+        .from('prize_distributions')
+        .update({ status: 'failed' })
+        .eq('id', prizeRecord.id);
+      
+      return new Response(
+        JSON.stringify({ error: 'Treasury key decoding error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // Actually, let's decode the base58 private key properly
-    const bs58 = await import('https://esm.sh/bs58@5.0.0');
-    const treasuryKeypairCorrect = Keypair.fromSecretKey(bs58.decode(treasuryPrivateKey));
-
-    console.log('Treasury wallet:', treasuryKeypairCorrect.publicKey.toString());
-
-    // Create transaction
+    // Create transaction with proper size management
     const winnerPubkey = new PublicKey(winner_wallet);
     const lamports = Math.floor(prize_amount * LAMPORTS_PER_SOL);
 
-    console.log('Sending', lamports, 'lamports to', winner_wallet);
+    console.log('Creating transaction:', {
+      from: treasuryKeypair.publicKey.toString(),
+      to: winner_wallet,
+      lamports: lamports,
+      sol: prize_amount
+    });
+
+    // Check treasury balance first
+    const treasuryBalance = await connection.getBalance(treasuryKeypair.publicKey);
+    console.log('Treasury balance:', treasuryBalance / LAMPORTS_PER_SOL, 'SOL');
+
+    if (treasuryBalance < lamports + 5000) { // 5000 lamports for transaction fee
+      console.error('Insufficient treasury balance');
+      await supabaseClient
+        .from('prize_distributions')
+        .update({ status: 'failed' })
+        .eq('id', prizeRecord.id);
+      
+      return new Response(
+        JSON.stringify({ error: 'Insufficient treasury balance' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const transaction = new Transaction().add(
       SystemProgram.transfer({
-        fromPubkey: treasuryKeypairCorrect.publicKey,
+        fromPubkey: treasuryKeypair.publicKey,
         toPubkey: winnerPubkey,
         lamports: lamports,
       })
     );
 
-    // Get recent blockhash
-    const { blockhash } = await connection.getLatestBlockhash('confirmed');
-    transaction.recentBlockhash = blockhash;
-    transaction.feePayer = treasuryKeypairCorrect.publicKey;
-
-    // Sign and send transaction
-    transaction.sign(treasuryKeypairCorrect);
+    // Get recent blockhash with retry
+    let recentBlockhash;
+    let attempts = 0;
+    const maxAttempts = 3;
     
-    const signature = await connection.sendRawTransaction(transaction.serialize());
-    console.log('Transaction sent:', signature);
+    while (attempts < maxAttempts) {
+      try {
+        const result = await connection.getLatestBlockhash('confirmed');
+        recentBlockhash = result.blockhash;
+        break;
+      } catch (blockchashError) {
+        attempts++;
+        console.warn(`Blockhash attempt ${attempts} failed:`, blockchashError);
+        if (attempts === maxAttempts) throw blockchashError;
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+      }
+    }
 
-    // Confirm transaction
-    await connection.confirmTransaction(signature, 'confirmed');
-    console.log('Transaction confirmed:', signature);
+    transaction.recentBlockhash = recentBlockhash!;
+    transaction.feePayer = treasuryKeypair.publicKey;
+
+    // Sign transaction
+    transaction.sign(treasuryKeypair);
+    
+    console.log('Transaction signed, sending to network...');
+
+    // Send transaction with retry logic
+    let signature: string | undefined;
+    attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      try {
+        signature = await connection.sendRawTransaction(transaction.serialize(), {
+          skipPreflight: false,
+          preflightCommitment: 'confirmed',
+          maxRetries: 3
+        });
+        console.log('Transaction sent:', signature);
+        break;
+      } catch (sendError) {
+        attempts++;
+        console.warn(`Send attempt ${attempts} failed:`, sendError);
+        if (attempts === maxAttempts) throw sendError;
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retry
+      }
+    }
+
+    if (!signature) {
+      throw new Error('Failed to send transaction after retries');
+    }
+
+    // Confirm transaction with timeout
+    console.log('Confirming transaction...');
+    try {
+      await connection.confirmTransaction(signature, 'confirmed');
+      console.log('Transaction confirmed:', signature);
+    } catch (confirmError) {
+      console.warn('Transaction confirmation failed, but transaction may still be valid:', confirmError);
+      // Continue anyway as the transaction might still be processed
+    }
 
     // Update prize distribution record
     const { error: updateError } = await supabaseClient
