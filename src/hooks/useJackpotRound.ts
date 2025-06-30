@@ -106,11 +106,11 @@ export const useJackpotRound = () => {
         const result = JackpotSystem.checkAndEndExpiredRound();
         if (result.roundEnded) {
           if (result.winner) {
-            // Check if there was already a jackpot winner (score 100) in this round
+            // Check if round had any jackpot winner (score 100)
             const hadJackpotWinner = round.games.some(game => game.score === 100);
             
             if (!hadJackpotWinner) {
-              // Only distribute prize if NO jackpot winner occurred during the round
+              // Only distribute prize if NO jackpot occurred during the round
               const treasuryBalance = await JackpotSystem.getPrizePool();
               const winnerWithPrize = {
                 ...result.winner,
@@ -123,7 +123,7 @@ export const useJackpotRound = () => {
                 { duration: 8000 }
               );
               
-              // Real prize distribution for round end winners (only if no jackpot occurred)
+              // Real prize distribution for round end winners
               const distributed = await distributePrize(winnerWithPrize);
               
               // Initialize new round after distribution
@@ -136,7 +136,7 @@ export const useJackpotRound = () => {
                 }, 3000);
               }
             } else {
-              // Round had a jackpot winner, so just show notification without prize distribution
+              // Round had a jackpot winner, so no prize for round end
               toast.success(`⏰ ROUND ENDED! ${result.winner.player.slice(0, 6)}...${result.winner.player.slice(-4)} had the highest score (${result.winner.score}), but the jackpot was already won this round!`, {
                 duration: 8000
               });
@@ -175,9 +175,9 @@ export const useJackpotRound = () => {
     const currentBalance = await JackpotSystem.getPrizePool();
     setPrizePool(currentBalance);
     
-    // Check for PERFECT SCORE JACKPOT (100 points)
+    // Check for PERFECT SCORE JACKPOT (100 points) - RESTART ROUND IMMEDIATELY
     if (gameEntry.score === 100) {
-      console.log('🎰 PERFECT SCORE JACKPOT! Score: 100 - Awarding ALL treasury funds!');
+      console.log('🎰 PERFECT SCORE JACKPOT! Score: 100 - Awarding ALL treasury funds and restarting round!');
       
       const winnerWithCurrentPrize = {
         player: gameEntry.player,
@@ -198,7 +198,7 @@ export const useJackpotRound = () => {
       const distributed = await distributePrize(winnerWithCurrentPrize);
       
       if (distributed) {
-        // Initialize new round with current treasury balance after distribution
+        // RESTART ROUND IMMEDIATELY after jackpot
         setTimeout(async () => {
           const newBalance = await JackpotSystem.getPrizePool();
           const newRound = JackpotSystem.initializeRound(newBalance);
