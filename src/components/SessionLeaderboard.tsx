@@ -63,7 +63,7 @@ const SessionLeaderboard = ({ players }: SessionLeaderboardProps) => {
         </h3>
         
         <div className="space-y-2 max-h-96 overflow-y-auto">
-          {players.slice(0, 8).map((player, index) => {
+          {players.slice(0, 5).map((player, index) => {
             const rank = index + 1;
             return (
               <div 
@@ -93,9 +93,9 @@ const SessionLeaderboard = ({ players }: SessionLeaderboardProps) => {
           })}
         </div>
         
-        {players.length > 8 && (
+        {players.length > 5 && (
           <div className="mt-2 text-center text-slate-400 pixel-font text-xs">
-            +{players.length - 8} more
+            +{players.length - 5} more
           </div>
         )}
       </div>
