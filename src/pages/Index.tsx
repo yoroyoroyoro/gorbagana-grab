@@ -39,6 +39,13 @@ const Index = () => {
   // Modal state
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
+  // Transform sessionLeaderboard to match SessionPlayer interface
+  const sessionPlayers = sessionLeaderboard.map(entry => ({
+    publicKey: entry.player,
+    bestScore: entry.bestScore,
+    gamesPlayed: 1 // We don't track games played per session, so default to 1
+  }));
+
   // Listen for round events to clear session leaderboard
   useEffect(() => {
     const handleRoundEnded = () => {
@@ -239,7 +246,7 @@ const Index = () => {
             
             {/* Session Leaderboard - Now inline on mobile */}
             <div className="w-full sm:w-auto">
-              <SessionLeaderboard players={sessionLeaderboard} />
+              <SessionLeaderboard players={sessionPlayers} />
             </div>
           </div>
         </div>
