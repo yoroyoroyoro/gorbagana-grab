@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { User, Trophy, Clock, Wallet, LogOut } from 'lucide-react';
+import { User, Wallet, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface NavigationPillsProps {
@@ -18,18 +18,6 @@ const NavigationPills = ({ isConnected, publicKey, onConnect, onDisconnect }: Na
           <Link to="/stats">
             <User className="w-4 h-4 mr-2" />
             STATS
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="pixel-pill">
-          <Link to="/leaderboard">
-            <Trophy className="w-4 h-4 mr-2" />
-            SCORES
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="pixel-pill">
-          <Link to="/recent">
-            <Clock className="w-4 h-4 mr-2" />
-            RECENT
           </Link>
         </Button>
         {!isConnected ? (
