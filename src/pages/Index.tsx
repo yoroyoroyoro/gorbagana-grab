@@ -166,7 +166,7 @@ const Index = () => {
     }
   };
 
-  const handleGameStop = (score: number) => {
+  const handleGameStop = async (score: number) => {
     setIsPlaying(false);
     setCurrentScore(score);
     
@@ -183,8 +183,8 @@ const Index = () => {
       updateSessionLeaderboard(publicKey!, score);
     }
 
-    // Add game to jackpot system
-    const updatedRound = addGameToRound(gameEntry, 0.05);
+    // Add game to jackpot system (await the promise)
+    const updatedRound = await addGameToRound(gameEntry, 0.05);
 
     // Check if this game won something
     const winnerGame = updatedRound.games.find(g => g.id === gameEntry.id);

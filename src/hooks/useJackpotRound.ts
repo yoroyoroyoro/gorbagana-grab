@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { JackpotSystem } from '@/utils/jackpotSystem';
@@ -93,12 +94,19 @@ export const useJackpotRound = () => {
         const result = JackpotSystem.checkAndEndExpiredRound();
         if (result.roundEnded) {
           if (result.winner) {
+            // Get current treasury balance for the actual prize amount
+            const treasuryBalance = await JackpotSystem.getPrizePool();
+            const winnerWithPrize = {
+              ...result.winner,
+              prize: treasuryBalance
+            };
+            
             toast.success(
-              `Round ended! ${result.winner.player.slice(0, 6)}...${result.winner.player.slice(-4)} won ${result.winner.prize.toFixed(2)} GOR with score ${result.winner.score}!`
+              `Round ended! ${winnerWithPrize.player.slice(0, 6)}...${winnerWithPrize.player.slice(-4)} won ${winnerWithPrize.prize.toFixed(2)} GOR with score ${winnerWithPrize.score}!`
             );
             
             // Distribute the prize automatically
-            distributePrize(result.winner);
+            distributePrize(winnerWithPrize);
           } else {
             toast.success('Round ended! No games were played.');
           }
@@ -127,10 +135,14 @@ export const useJackpotRound = () => {
     
     // If there's a winner (jackpot), distribute ALL treasury funds
     if (updatedRound.winner) {
-      distributePrize(updatedRound.winner);
+      const winnerWithCurrentPrize = {
+        ...updatedRound.winner,
+        prize: currentBalance
+      };
+      distributePrize(winnerWithCurrentPrize);
       
       // Trigger a custom event to notify other components about jackpot
-      window.dispatchEvent(new CustomEvent('jackpotWon', { detail: updatedRound.winner }));
+      window.dispatchEvent(new CustomEvent('jackpotWon', { detail: winnerWithCurrentPrize }));
     }
     
     return updatedRound;

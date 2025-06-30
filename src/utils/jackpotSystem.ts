@@ -1,3 +1,4 @@
+
 import { gorConnection } from './gorConnection';
 
 interface GameEntry {
@@ -72,7 +73,7 @@ export class JackpotSystem {
     if (!round || this.isRoundExpired(round)) {
       // End current round if it exists and is expired
       if (round) {
-        this.endRound(round);
+        await this.endRoundAsync(round);
       }
       // Start new round with current treasury balance
       const currentBalance = await this.getPrizePool();
@@ -98,7 +99,7 @@ export class JackpotSystem {
       };
       
       // End round immediately on jackpot
-      this.endRound(round);
+      await this.endRoundAsync(round);
       return this.initializeRound(0);
     }
 
@@ -116,7 +117,7 @@ export class JackpotSystem {
     return Math.max(0, Math.floor(remaining / 1000));
   }
 
-  static async endRound(round: RoundData): Promise<RoundData> {
+  static async endRoundAsync(round: RoundData): Promise<RoundData> {
     if (!round.winner && round.games.length > 0) {
       // Find highest score(s)
       const highestScore = Math.max(...round.games.map(g => g.score));
@@ -135,6 +136,45 @@ export class JackpotSystem {
           player: winner.player,
           score: winner.score,
           prize: treasuryBalance,
+          winType: 'highest_score'
+        };
+
+        // Update the game entry in the round
+        const gameIndex = round.games.findIndex(g => g.id === winner.id);
+        if (gameIndex !== -1) {
+          round.games[gameIndex] = winner;
+        }
+      }
+    }
+
+    // Save to history
+    this.saveRoundToHistory(round);
+    
+    // Clear current round
+    localStorage.removeItem(this.STORAGE_KEY);
+    
+    return round;
+  }
+
+  // Synchronous version for compatibility
+  static endRound(round: RoundData): RoundData {
+    if (!round.winner && round.games.length > 0) {
+      // Find highest score(s)
+      const highestScore = Math.max(...round.games.map(g => g.score));
+      const highestScoreGames = round.games.filter(g => g.score === highestScore);
+      
+      if (highestScoreGames.length > 0) {
+        // Award to first person to achieve the highest score
+        const winner = highestScoreGames.reduce((earliest, current) => 
+          current.timestamp < earliest.timestamp ? current : earliest
+        );
+        
+        // Note: This sync version can't get real treasury balance
+        // The prize will be set when the async distribution happens
+        round.winner = {
+          player: winner.player,
+          score: winner.score,
+          prize: 0, // Will be updated during distribution
           winType: 'highest_score'
         };
 
