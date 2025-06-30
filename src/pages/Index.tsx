@@ -274,7 +274,11 @@ const Index = () => {
       prize: 0
     };
 
-    // Update session leaderboard
+    // Get current round ID before adding the game (in case it triggers a jackpot)
+    const currentRound = JackpotSystem.getCurrentRound();
+    const currentRoundId = currentRound?.roundId;
+
+    // Update session leaderboard first (before potential jackpot reset)
     updateSessionLeaderboard(publicKey!, score);
 
     // Add game to jackpot system
@@ -294,10 +298,11 @@ const Index = () => {
       };
       savePlayerStats(updatedStats);
       
-      // Clear session leaderboard immediately on jackpot
+      // Clear session leaderboard immediately on jackpot using the OLD round ID
       setSessionLeaderboard([]);
-      // Clear from localStorage
-      localStorage.removeItem(`sessionLeaderboard_${updatedRound.roundId}`);
+      if (currentRoundId) {
+        localStorage.removeItem(`sessionLeaderboard_${currentRoundId}`);
+      }
       
       // Reset time for new round
       setTimeRemaining(86400);
