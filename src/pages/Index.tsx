@@ -23,13 +23,14 @@ interface GameEntry {
 
 const Index = () => {
   // Wallet integration
-  const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect } = useBackpackWallet();
+  const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect, signTransaction } = useBackpackWallet();
   const [gorBalance, setGorBalance] = useState<number>(0);
   const [balanceLoaded, setBalanceLoaded] = useState(false);
 
   // Game state
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentScore, setCurrentScore] = useState<number | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Custom hooks
   const { prizePool, timeRemaining, formatTime, addGameToRound, resetTimeForNewRound } = useJackpotRound();
@@ -101,26 +102,36 @@ const Index = () => {
       return;
     }
 
+    setIsProcessingPayment(true);
+
     try {
       const fromPubkey = new PublicKey(publicKey);
-      const toPubkey = fromPubkey; 
       
-      const transaction = await gorConnection.createGamePaymentTransaction(
-        fromPubkey,
-        toPubkey,
-        0.05
-      );
-
+      // Create the actual payment transaction
+      const transaction = await gorConnection.createGamePaymentTransaction(fromPubkey, 0.05);
+      
+      // Sign the transaction using the wallet
+      const signedTransaction = await signTransaction(transaction);
+      
+      // Send the signed transaction
+      const signature = await gorConnection.sendTransaction(signedTransaction, fromPubkey);
+      
+      console.log('Payment transaction signature:', signature);
       toast.success('Payment of 0.05 GOR processed! Game starting...');
       
       setIsPlaying(true);
       setCurrentScore(null);
       
       updateStatsForGame(0, 0); // Just increment games played
-      setGorBalance(prev => prev - 0.05);
+      
+      // Refresh balance after payment
+      await checkGorBalance();
+      
     } catch (error) {
       console.error('Payment failed:', error);
       toast.error('Payment failed. Please try again.');
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -151,8 +162,8 @@ const Index = () => {
       
       updateStatsForGame(score, winnerGame.prize);
       
-      // Update balance to reflect the prize
-      setGorBalance(prev => prev + winnerGame.prize);
+      // Note: In a real implementation, the prize distribution would happen
+      // automatically from the game treasury wallet to the winner's wallet
       
       // Reset time for new round
       resetTimeForNewRound();
@@ -211,9 +222,20 @@ const Index = () => {
             isPlaying={isPlaying}
             onStop={handleGameStop}
             onStartGame={handleStartGame}
-            canPlay={isConnected && balanceLoaded && gorBalance >= 0.05}
+            canPlay={isConnected && balanceLoaded && gorBalance >= 0.05 && !isProcessingPayment}
           />
         </div>
+
+        {/* Processing Payment */}
+        {isProcessingPayment && (
+          <div className="text-center mt-8">
+            <div className="clean-card border-yellow-400/50 bg-yellow-900/30">
+              <p className="text-yellow-300 pixel-font">
+                PROCESSING PAYMENT...
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Balance Warning */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (

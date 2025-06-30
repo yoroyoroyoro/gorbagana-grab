@@ -4,6 +4,9 @@ import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } f
 // Gorbagana testnet RPC endpoint (HTTPS)
 const GORBAGANA_RPC_URL = 'https://rpc.gorbagana.wtf/';
 
+// Game treasury wallet (replace with actual treasury wallet address)
+const GAME_TREASURY_WALLET = new PublicKey('FNd3TjAxv9FTK3YCQVMrWtP9LWFoaUwWLq7KsfGBn6vT');
+
 export class GorConnection {
   private connection: Connection;
 
@@ -39,11 +42,11 @@ export class GorConnection {
     }
   }
 
-  async createGamePaymentTransaction(fromPubkey: PublicKey, toPubkey: PublicKey, amount: number): Promise<Transaction> {
+  async createGamePaymentTransaction(fromPubkey: PublicKey, amount: number): Promise<Transaction> {
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey,
-        toPubkey,
+        toPubkey: GAME_TREASURY_WALLET, // Send to game treasury instead of self
         lamports: amount * LAMPORTS_PER_SOL, // Convert SOL to lamports
       })
     );
@@ -51,10 +54,10 @@ export class GorConnection {
     return transaction;
   }
 
-  async createPrizeDistributionTransaction(fromPubkey: PublicKey, toPubkey: PublicKey, amount: number): Promise<Transaction> {
+  async createPrizeDistributionTransaction(toPubkey: PublicKey, amount: number): Promise<Transaction> {
     const transaction = new Transaction().add(
       SystemProgram.transfer({
-        fromPubkey,
+        fromPubkey: GAME_TREASURY_WALLET, // Send from game treasury
         toPubkey,
         lamports: amount * LAMPORTS_PER_SOL, // Convert GOR to lamports
       })
@@ -65,6 +68,10 @@ export class GorConnection {
 
   getConnection(): Connection {
     return this.connection;
+  }
+
+  getTreasuryWallet(): PublicKey {
+    return GAME_TREASURY_WALLET;
   }
 }
 
