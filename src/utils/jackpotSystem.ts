@@ -82,6 +82,21 @@ export class JackpotSystem {
       round.prizePool = await this.getPrizePool();
     }
 
+    // Check for INSTANT JACKPOT - Perfect score of 100
+    if (game.score === 100) {
+      // Award ALL treasury funds for perfect score
+      const treasuryBalance = await this.getPrizePool();
+      game.prize = treasuryBalance;
+      
+      // Mark as jackpot winner
+      round.winner = {
+        player: game.player,
+        score: game.score,
+        prize: treasuryBalance,
+        winType: 'jackpot'
+      };
+    }
+
     // Add game to round
     round.games.push(game);
     

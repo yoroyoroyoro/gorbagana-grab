@@ -159,38 +159,40 @@ export const useJackpotRound = () => {
     const currentBalance = await JackpotSystem.getPrizePool();
     setPrizePool(currentBalance);
     
-    // TESTING: Award prize for ANY score (not just 100)
-    console.log('🎰 TESTING MODE: Awarding prize for any score with REAL distribution!');
-    
-    const winnerWithCurrentPrize = {
-      player: gameEntry.player,
-      score: gameEntry.score,
-      prize: currentBalance,
-      winType: 'test_prize' as const,
-      gameId: gameEntry.id
-    };
-    
-    console.log('REAL PRIZE DISTRIBUTION! Calling Edge Function:', winnerWithCurrentPrize);
-    
-    // Show immediate prize notification
-    toast.success(`🎰 JACKPOT! ${gameEntry.player.slice(0, 6)}...${gameEntry.player.slice(-4)} scored ${gameEntry.score}! Initiating ${currentBalance.toFixed(2)} SOL transfer...`, {
-      duration: 8000
-    });
-    
-    // Real prize distribution immediately
-    const distributed = await distributePrize(winnerWithCurrentPrize);
-    
-    if (distributed) {
-      // Initialize new round with current treasury balance after distribution
-      setTimeout(async () => {
-        const newBalance = await JackpotSystem.getPrizePool();
-        const newRound = JackpotSystem.initializeRound(newBalance);
-        setPrizePool(newBalance);
-        setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
-      }, 3000);
+    // Check for PERFECT SCORE JACKPOT (100 points)
+    if (gameEntry.score === 100) {
+      console.log('🎰 PERFECT SCORE JACKPOT! Score: 100 - Awarding ALL treasury funds!');
       
-      // Trigger a custom event to notify other components about prize
-      window.dispatchEvent(new CustomEvent('jackpotWon', { detail: winnerWithCurrentPrize }));
+      const winnerWithCurrentPrize = {
+        player: gameEntry.player,
+        score: gameEntry.score,
+        prize: currentBalance,
+        winType: 'jackpot' as const,
+        gameId: gameEntry.id
+      };
+      
+      console.log('REAL JACKPOT DISTRIBUTION! Calling Edge Function:', winnerWithCurrentPrize);
+      
+      // Show immediate jackpot notification
+      toast.success(`🎰 PERFECT JACKPOT! ${gameEntry.player.slice(0, 6)}...${gameEntry.player.slice(-4)} scored 100! Initiating ${currentBalance.toFixed(2)} SOL transfer...`, {
+        duration: 8000
+      });
+      
+      // Real prize distribution immediately
+      const distributed = await distributePrize(winnerWithCurrentPrize);
+      
+      if (distributed) {
+        // Initialize new round with current treasury balance after distribution
+        setTimeout(async () => {
+          const newBalance = await JackpotSystem.getPrizePool();
+          const newRound = JackpotSystem.initializeRound(newBalance);
+          setPrizePool(newBalance);
+          setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
+        }, 3000);
+        
+        // Trigger a custom event to notify other components about jackpot
+        window.dispatchEvent(new CustomEvent('jackpotWon', { detail: winnerWithCurrentPrize }));
+      }
     }
     
     return updatedRound;
