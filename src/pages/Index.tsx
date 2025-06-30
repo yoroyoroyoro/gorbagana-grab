@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import GameHeader from '@/components/GameHeader';
 import GameArea from '@/components/GameArea';
+import SessionLeaderboard from '@/components/SessionLeaderboard';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
 import { gorConnection } from '@/utils/gorConnection';
 import { JackpotSystem } from '@/utils/jackpotSystem';
@@ -28,6 +30,12 @@ interface GameEntry {
   prize: number;
 }
 
+interface SessionLeaderEntry {
+  player: string;
+  bestScore: number;
+  timestamp: Date;
+}
+
 const Index = () => {
   // Wallet integration
   const { isConnected, publicKey, isLoading, connect: connectWallet, disconnect } = useBackpackWallet();
@@ -39,6 +47,9 @@ const Index = () => {
   const [prizePool, setPrizePool] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(86400); // 24 hours in seconds
   const [currentScore, setCurrentScore] = useState<number | null>(null);
+
+  // Session leaderboard
+  const [sessionLeaderboard, setSessionLeaderboard] = useState<SessionLeaderEntry[]>([]);
 
   // Player data
   const [playerStats, setPlayerStats] = useState<PlayerData>({
@@ -60,6 +71,9 @@ const Index = () => {
     }
     setPrizePool(round.prizePool);
     setTimeRemaining(JackpotSystem.getTimeRemaining(round));
+    
+    // Load session leaderboard for current round
+    loadSessionLeaderboard(round.roundId);
   }, []);
 
   // Timer countdown and round management
@@ -83,10 +97,11 @@ const Index = () => {
             toast.success('Round ended! No games were played.');
           }
           
-          // Reset for new round
+          // Reset session leaderboard for new round
           const newRound = JackpotSystem.initializeRound(0);
           setPrizePool(newRound.prizePool);
           setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
+          resetSessionLeaderboard(newRound.roundId);
         }
       }
     }, 1000);
@@ -104,6 +119,72 @@ const Index = () => {
       setGorBalance(0);
     }
   }, [isConnected, publicKey]);
+
+  const loadSessionLeaderboard = (roundId: string) => {
+    const storedLeaderboard = localStorage.getItem(`sessionLeaderboard_${roundId}`);
+    if (storedLeaderboard) {
+      const leaderboard = JSON.parse(storedLeaderboard).map((entry: any) => ({
+        ...entry,
+        timestamp: new Date(entry.timestamp)
+      }));
+      setSessionLeaderboard(leaderboard);
+    } else {
+      setSessionLeaderboard([]);
+    }
+  };
+
+  const resetSessionLeaderboard = (newRoundId: string) => {
+    setSessionLeaderboard([]);
+    // Clear old leaderboard data
+    const round = JackpotSystem.getCurrentRound();
+    if (round) {
+      localStorage.removeItem(`sessionLeaderboard_${round.roundId}`);
+    }
+  };
+
+  const updateSessionLeaderboard = (player: string, score: number) => {
+    const round = JackpotSystem.getCurrentRound();
+    if (!round) return;
+
+    setSessionLeaderboard(prev => {
+      const existingEntryIndex = prev.findIndex(entry => entry.player === player);
+      let newLeaderboard;
+
+      if (existingEntryIndex >= 0) {
+        // Update existing entry if new score is better
+        if (score > prev[existingEntryIndex].bestScore) {
+          newLeaderboard = [...prev];
+          newLeaderboard[existingEntryIndex] = {
+            player,
+            bestScore: score,
+            timestamp: new Date()
+          };
+        } else {
+          newLeaderboard = prev;
+        }
+      } else {
+        // Add new entry
+        newLeaderboard = [...prev, {
+          player,
+          bestScore: score,
+          timestamp: new Date()
+        }];
+      }
+
+      // Sort by best score (highest first), then by timestamp (earliest first for ties)
+      const sortedLeaderboard = newLeaderboard.sort((a, b) => {
+        if (a.bestScore !== b.bestScore) {
+          return b.bestScore - a.bestScore;
+        }
+        return a.timestamp.getTime() - b.timestamp.getTime();
+      });
+
+      // Save to localStorage
+      localStorage.setItem(`sessionLeaderboard_${round.roundId}`, JSON.stringify(sortedLeaderboard));
+      
+      return sortedLeaderboard;
+    });
+  };
 
   const checkGorBalance = async () => {
     if (!publicKey) return;
@@ -197,6 +278,9 @@ const Index = () => {
       prize: 0
     };
 
+    // Update session leaderboard
+    updateSessionLeaderboard(publicKey!, score);
+
     // Add game to jackpot system
     const updatedRound = JackpotSystem.addGameToRound(gameEntry, 0.05);
     setPrizePool(updatedRound.prizePool);
@@ -214,8 +298,12 @@ const Index = () => {
       };
       savePlayerStats(updatedStats);
       
-      // Reset timer for new round
+      // Reset session leaderboard for new round
       setTimeRemaining(86400);
+      const newRound = JackpotSystem.getCurrentRound();
+      if (newRound) {
+        resetSessionLeaderboard(newRound.roundId);
+      }
     } else {
       const updatedStats = {
         ...playerStats,
@@ -329,6 +417,11 @@ const Index = () => {
           />
         </div>
 
+        {/* Session Leaderboard */}
+        <div className="mb-8">
+          <SessionLeaderboard players={sessionLeaderboard} />
+        </div>
+
         {/* Balance Warning */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
           <div className="text-center mt-8">
@@ -360,38 +453,45 @@ const Index = () => {
             </div>
           </DialogTrigger>
           
-          <DialogContent className="max-w-lg bg-gradient-to-r from-purple-900/95 to-blue-900/95 border-purple-400/40 text-purple-100">
+          <DialogContent className="max-w-lg bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-slate-800/95 border-teal-400/40 text-slate-100 backdrop-blur-sm">
             <DialogHeader>
-              <DialogTitle className="pixel-font text-xl text-purple-300 text-center">
+              <DialogTitle className="pixel-font text-2xl text-teal-300 text-center mb-4">
                 ROUND SYSTEM GUIDE
               </DialogTitle>
             </DialogHeader>
             
-            <div className="pixel-font text-sm space-y-4 mt-4">
-              <div className="flex items-start gap-3">
-                <span className="text-teal-300 text-lg">•</span>
-                <span>Perfect hit (100 score) = Instant jackpot win!</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-emerald-300 text-lg">•</span>
-                <span>Each round lasts exactly 24 hours</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-cyan-300 text-lg">•</span>
-                <span>If no jackpot, highest scorer wins the prize pool</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-yellow-300 text-lg">•</span>
-                <span>Tied scores? First to achieve it wins!</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-pink-300 text-lg">•</span>
-                <span>0.05 GOR per game adds to the prize pool</span>
+            <div className="pixel-font text-sm space-y-6 mt-6">
+              <div className="p-4 bg-teal-900/30 rounded-lg border border-teal-400/30">
+                <h3 className="text-teal-300 font-bold mb-2">Perfect Hit Jackpot</h3>
+                <p className="text-slate-300">Score exactly 100 points to instantly win the entire prize pool!</p>
               </div>
               
-              <div className="mt-6 pt-4 border-t border-purple-400/30 text-center">
-                <div className="text-purple-300 pixel-font text-sm">
-                  Pay 0.05 GOR to play • Hit the trash perfectly • Win big!
+              <div className="p-4 bg-emerald-900/30 rounded-lg border border-emerald-400/30">
+                <h3 className="text-emerald-300 font-bold mb-2">24-Hour Rounds</h3>
+                <p className="text-slate-300">Each round lasts exactly 24 hours. Make every game count!</p>
+              </div>
+              
+              <div className="p-4 bg-cyan-900/30 rounded-lg border border-cyan-400/30">
+                <h3 className="text-cyan-300 font-bold mb-2">Highest Score Wins</h3>
+                <p className="text-slate-300">If no jackpot is hit, the player with the highest score wins the prize pool.</p>
+              </div>
+              
+              <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-400/30">
+                <h3 className="text-yellow-300 font-bold mb-2">Tiebreaker Rule</h3>
+                <p className="text-slate-300">When scores are tied, the first player to achieve that score wins!</p>
+              </div>
+              
+              <div className="p-4 bg-pink-900/30 rounded-lg border border-pink-400/30">
+                <h3 className="text-pink-300 font-bold mb-2">Entry Fee</h3>
+                <p className="text-slate-300">Each game costs 0.05 GOR, which adds directly to the growing prize pool.</p>
+              </div>
+              
+              <div className="mt-8 pt-6 border-t border-teal-400/30 text-center">
+                <div className="text-teal-300 pixel-font text-lg font-bold">
+                  Pay → Play → Win Big!
+                </div>
+                <div className="text-slate-400 pixel-font text-xs mt-2">
+                  Time your tap perfectly to hit the trash can
                 </div>
               </div>
             </div>
