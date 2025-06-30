@@ -1,11 +1,12 @@
 
+
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 // Gorbagana testnet RPC endpoint (HTTPS)
 const GORBAGANA_RPC_URL = 'https://rpc.gorbagana.wtf/';
 
-// Use a well-known system program address as treasury (this always exists)
-const GAME_TREASURY_WALLET = new PublicKey('11111111111111111111111111111112');
+// Game treasury wallet address
+const GAME_TREASURY_WALLET = new PublicKey('HfgivaZsGLN9e7AE2TRkMXhdoRzCqjLwXHeFeTcgW5tY');
 
 export class GorConnection {
   private connection: Connection;
@@ -97,3 +98,4 @@ export class GorConnection {
 }
 
 export const gorConnection = new GorConnection();
+
