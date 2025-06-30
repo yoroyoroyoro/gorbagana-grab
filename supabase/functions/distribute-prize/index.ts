@@ -22,13 +22,13 @@ serve(async (req) => {
 
     const { winner_wallet, prize_amount, game_id, win_type } = await req.json();
 
-    console.log('Prize distribution request:', { winner_wallet, prize_amount, game_id, win_type });
+    console.log('🎰 Prize distribution request:', { winner_wallet, prize_amount, game_id, win_type });
 
     // Validate input
     if (!winner_wallet || !game_id) {
-      console.error('Missing required fields');
+      console.error('❌ Missing required fields');
       return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
+        JSON.stringify({ error: 'Missing required fields', success: false }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -46,14 +46,14 @@ serve(async (req) => {
       .single();
 
     if (insertError) {
-      console.error('Database insert error:', insertError);
+      console.error('❌ Database insert error:', insertError);
       return new Response(
-        JSON.stringify({ error: 'Failed to create prize record' }),
+        JSON.stringify({ error: 'Failed to create prize record', success: false }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Prize record created:', prizeRecord.id);
+    console.log('✅ Prize record created:', prizeRecord.id);
 
     // Setup Solana connection
     const connection = new Connection('https://rpc.gorbagana.wtf/', {
@@ -65,14 +65,14 @@ serve(async (req) => {
     // Get treasury private key from environment
     const treasuryPrivateKey = Deno.env.get('TREASURY_PRIVATE_KEY');
     if (!treasuryPrivateKey) {
-      console.error('Treasury private key not found in environment');
+      console.error('❌ Treasury private key not found in environment');
       await supabaseClient
         .from('prize_distributions')
         .update({ status: 'failed' })
         .eq('id', prizeRecord.id);
       
       return new Response(
-        JSON.stringify({ error: 'Treasury configuration error' }),
+        JSON.stringify({ error: 'Treasury configuration error', success: false }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -85,45 +85,61 @@ serve(async (req) => {
       // Decode the base58 private key
       const privateKeyBytes = bs58decode(treasuryPrivateKey);
       treasuryKeypair = Keypair.fromSecretKey(privateKeyBytes);
-      console.log('Treasury wallet loaded:', treasuryKeypair.publicKey.toString());
+      console.log('🔑 Treasury wallet loaded:', treasuryKeypair.publicKey.toString());
     } catch (keyError) {
-      console.error('Failed to decode treasury private key:', keyError);
+      console.error('❌ Failed to decode treasury private key:', keyError);
       await supabaseClient
         .from('prize_distributions')
         .update({ status: 'failed' })
         .eq('id', prizeRecord.id);
       
       return new Response(
-        JSON.stringify({ error: 'Treasury key decoding error' }),
+        JSON.stringify({ error: 'Treasury key decoding error', success: false }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Get ALL treasury balance (minus transaction fee)
     const treasuryBalance = await connection.getBalance(treasuryKeypair.publicKey);
-    console.log('Treasury balance:', treasuryBalance / LAMPORTS_PER_SOL, 'SOL');
+    console.log('💰 Treasury balance:', treasuryBalance / LAMPORTS_PER_SOL, 'SOL');
 
     const transactionFee = 5000; // 5000 lamports for transaction fee
     const lamportsToSend = treasuryBalance - transactionFee;
 
     if (lamportsToSend <= 0) {
-      console.error('Insufficient treasury balance for transaction');
+      console.error('❌ Insufficient treasury balance for transaction');
       await supabaseClient
         .from('prize_distributions')
         .update({ status: 'failed' })
         .eq('id', prizeRecord.id);
       
       return new Response(
-        JSON.stringify({ error: 'Insufficient treasury balance' }),
+        JSON.stringify({ error: 'Insufficient treasury balance', success: false }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const actualPrizeAmount = lamportsToSend / LAMPORTS_PER_SOL;
-    console.log('Sending ALL treasury funds:', actualPrizeAmount, 'SOL to', winner_wallet);
+    console.log('💸 Sending ALL treasury funds:', actualPrizeAmount, 'SOL to', winner_wallet);
+
+    // Validate winner wallet address
+    let winnerPubkey: PublicKey;
+    try {
+      winnerPubkey = new PublicKey(winner_wallet);
+    } catch (pubkeyError) {
+      console.error('❌ Invalid winner wallet address:', pubkeyError);
+      await supabaseClient
+        .from('prize_distributions')
+        .update({ status: 'failed' })
+        .eq('id', prizeRecord.id);
+      
+      return new Response(
+        JSON.stringify({ error: 'Invalid winner wallet address', success: false }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Create transaction to send ALL treasury funds
-    const winnerPubkey = new PublicKey(winner_wallet);
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: treasuryKeypair.publicKey,
@@ -140,7 +156,7 @@ serve(async (req) => {
     // Sign transaction
     transaction.sign(treasuryKeypair);
     
-    console.log('Transaction signed, sending to network...');
+    console.log('✍️ Transaction signed, sending to network...');
 
     // Send transaction
     const signature = await connection.sendRawTransaction(transaction.serialize(), {
@@ -149,15 +165,15 @@ serve(async (req) => {
       maxRetries: 3
     });
     
-    console.log('Transaction sent:', signature);
+    console.log('📤 Transaction sent:', signature);
 
     // Confirm transaction
-    console.log('Confirming transaction...');
+    console.log('⏳ Confirming transaction...');
     try {
       await connection.confirmTransaction(signature, 'confirmed');
-      console.log('Transaction confirmed:', signature);
+      console.log('✅ Transaction confirmed:', signature);
     } catch (confirmError) {
-      console.warn('Transaction confirmation failed, but transaction may still be valid:', confirmError);
+      console.warn('⚠️ Transaction confirmation failed, but transaction may still be valid:', confirmError);
       // Continue anyway as the transaction might still be processed
     }
 
@@ -173,10 +189,10 @@ serve(async (req) => {
       .eq('id', prizeRecord.id);
 
     if (updateError) {
-      console.error('Failed to update prize record:', updateError);
+      console.error('❌ Failed to update prize record:', updateError);
     }
 
-    console.log('Prize distribution completed successfully!');
+    console.log('🎉 Prize distribution completed successfully!');
 
     return new Response(
       JSON.stringify({ 
@@ -189,9 +205,9 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Prize distribution error:', error);
+    console.error('💥 Prize distribution error:', error);
     return new Response(
-      JSON.stringify({ error: 'Prize distribution failed', details: error.message }),
+      JSON.stringify({ error: 'Prize distribution failed', details: error.message, success: false }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

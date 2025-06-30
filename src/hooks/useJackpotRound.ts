@@ -64,7 +64,7 @@ export const useJackpotRound = () => {
         toast.error('Failed to distribute prize automatically. Please contact support.', {
           description: `Error: ${error.message}`
         });
-        return;
+        return false;
       }
 
       if (data?.success) {
@@ -78,14 +78,18 @@ export const useJackpotRound = () => {
         setTimeout(() => {
           setPrizePool(0); // Treasury should be empty after full distribution
         }, 2000);
+        
+        return true;
       } else {
         console.error('Prize distribution failed:', data);
         toast.error('Failed to distribute prize automatically. Please contact support.');
+        return false;
       }
       
     } catch (error) {
       console.error('Failed to distribute prize:', error);
       toast.error('Failed to distribute prize automatically. Please contact support.');
+      return false;
     }
   };
 
@@ -116,28 +120,25 @@ export const useJackpotRound = () => {
             );
             
             // Distribute the prize automatically for round end winners too
-            await distributePrize(winnerWithPrize);
+            const distributed = await distributePrize(winnerWithPrize);
+            
+            // Initialize new round after distribution
+            if (distributed) {
+              setTimeout(async () => {
+                const currentBalance = await JackpotSystem.getPrizePool();
+                const newRound = JackpotSystem.initializeRound(currentBalance);
+                setPrizePool(currentBalance);
+                setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
+              }, 3000);
+            }
           } else {
             toast.success('Round ended! No games were played.');
             
-            // Still initialize new round even if no winner
+            // Initialize new round even if no winner
             const currentBalance = await JackpotSystem.getPrizePool();
             const newRound = JackpotSystem.initializeRound(currentBalance);
             setPrizePool(currentBalance);
             setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
-          }
-          
-          // Only initialize new round here if there was no winner (to avoid double initialization)
-          if (!result.winner) {
-            // Already handled above in the else block
-          } else {
-            // Initialize new round with current treasury balance (should be 0 after distribution)
-            setTimeout(async () => {
-              const currentBalance = await JackpotSystem.getPrizePool();
-              const newRound = JackpotSystem.initializeRound(currentBalance);
-              setPrizePool(currentBalance);
-              setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
-            }, 3000); // Wait a bit for transaction to process
           }
           
           // Trigger a custom event to notify other components
@@ -150,26 +151,47 @@ export const useJackpotRound = () => {
   }, []);
 
   const addGameToRound = async (gameEntry: GameEntry, paymentAmount: number) => {
+    console.log(`Adding game to round - Player: ${gameEntry.player}, Score: ${gameEntry.score}`);
+    
     const updatedRound = await JackpotSystem.addGameToRound(gameEntry, paymentAmount);
     
     // Update prize pool to reflect current treasury balance
     const currentBalance = await JackpotSystem.getPrizePool();
     setPrizePool(currentBalance);
     
-    // If there's a winner (jackpot), distribute ALL treasury funds
-    if (updatedRound.winner) {
+    // Check for INSTANT JACKPOT (score of 100)
+    if (gameEntry.score === 100) {
+      console.log('🎰 JACKPOT HIT! Score is 100!');
+      
       const winnerWithCurrentPrize = {
-        ...updatedRound.winner,
-        prize: currentBalance
+        player: gameEntry.player,
+        score: gameEntry.score,
+        prize: currentBalance,
+        winType: 'jackpot' as const
       };
       
       console.log('JACKPOT HIT! Distributing prize:', winnerWithCurrentPrize);
       
-      // Distribute the prize immediately
-      await distributePrize(winnerWithCurrentPrize);
+      // Show immediate jackpot notification
+      toast.success(`🎰 JACKPOT! ${gameEntry.player.slice(0, 6)}...${gameEntry.player.slice(-4)} hit 100! Distributing ${currentBalance.toFixed(2)} SOL...`, {
+        duration: 8000
+      });
       
-      // Trigger a custom event to notify other components about jackpot
-      window.dispatchEvent(new CustomEvent('jackpotWon', { detail: winnerWithCurrentPrize }));
+      // Distribute the prize immediately
+      const distributed = await distributePrize(winnerWithCurrentPrize);
+      
+      if (distributed) {
+        // Initialize new round with empty treasury after successful distribution
+        setTimeout(async () => {
+          const newBalance = await JackpotSystem.getPrizePool();
+          const newRound = JackpotSystem.initializeRound(newBalance);
+          setPrizePool(newBalance);
+          setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
+        }, 3000);
+        
+        // Trigger a custom event to notify other components about jackpot
+        window.dispatchEvent(new CustomEvent('jackpotWon', { detail: winnerWithCurrentPrize }));
+      }
     }
     
     return updatedRound;
