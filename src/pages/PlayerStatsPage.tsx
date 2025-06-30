@@ -1,11 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import StatsPage from '@/components/StatsPage';
+import PlayerStats from '@/components/PlayerStats';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
-import { gorConnection } from '@/utils/gorConnection';
-import { PublicKey } from '@solana/web3.js';
 
 interface PlayerData {
   walletAddress: string;
@@ -46,7 +45,7 @@ const PlayerStatsPage = () => {
           </Button>
         </div>
         
-        <StatsPage
+        <PlayerStats
           walletAddress={publicKey}
           totalWinnings={playerStats.totalWinnings}
           gamesPlayed={playerStats.gamesPlayed}
