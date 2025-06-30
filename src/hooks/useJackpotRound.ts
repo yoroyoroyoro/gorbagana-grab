@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { JackpotSystem } from '@/utils/jackpotSystem';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GameEntry {
   id: string;
@@ -44,33 +45,49 @@ export const useJackpotRound = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // TESTING: Simulate prize distribution without actual Solana transaction
-  const simulatePrizeDistribution = async (winner: { player: string; prize: number; winType: string }) => {
+  // Real prize distribution using Supabase Edge Function
+  const distributePrize = async (winner: { player: string; prize: number; winType: string; gameId: string }) => {
     try {
-      console.log(`SIMULATING: ${winner.prize.toFixed(2)} SOL distribution to ${winner.player}`);
+      console.log(`REAL DISTRIBUTION: ${winner.prize.toFixed(2)} SOL to ${winner.player}`);
       
-      // Simulate a successful transaction with a fake signature
-      const fakeTransactionSignature = `${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log(`SIMULATION: Prize distributed successfully! Mock Transaction: ${fakeTransactionSignature}`);
-      toast.success(`🎉 PRIZE SIMULATED! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} would receive ${winner.prize.toFixed(2)} SOL!`, {
-        description: `Mock Transaction: ${fakeTransactionSignature.slice(0, 8)}...${fakeTransactionSignature.slice(-8)}`,
-        duration: 10000
+      // Call the Supabase Edge Function for real prize distribution
+      const { data, error } = await supabase.functions.invoke('distribute-prize', {
+        body: {
+          winner_wallet: winner.player,
+          prize_amount: winner.prize,
+          game_id: winner.gameId,
+          win_type: winner.winType
+        }
       });
-      
-      // Update prize pool to 0 to simulate treasury being emptied
-      setTimeout(() => {
-        setPrizePool(0);
-      }, 2000);
-      
-      return true;
+
+      if (error) {
+        console.error('Prize distribution failed:', error);
+        toast.error('Failed to distribute prize automatically. Please contact support.');
+        return false;
+      }
+
+      if (data?.success) {
+        console.log('Prize distributed successfully!', data);
+        toast.success(`🎉 PRIZE DISTRIBUTED! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} received ${winner.prize.toFixed(2)} SOL!`, {
+          description: `Transaction: ${data.transaction_signature?.slice(0, 8)}...${data.transaction_signature?.slice(-8)}`,
+          duration: 10000
+        });
+        
+        // Update prize pool to 0 since treasury was emptied
+        setTimeout(() => {
+          setPrizePool(0);
+        }, 2000);
+        
+        return true;
+      } else {
+        console.error('Prize distribution failed:', data);
+        toast.error('Failed to distribute prize automatically. Please contact support.');
+        return false;
+      }
       
     } catch (error) {
-      console.error('Failed to simulate prize distribution:', error);
-      toast.error('Prize simulation failed');
+      console.error('Failed to distribute prize:', error);
+      toast.error('Failed to distribute prize automatically. Please contact support.');
       return false;
     }
   };
@@ -93,7 +110,8 @@ export const useJackpotRound = () => {
             const treasuryBalance = await JackpotSystem.getPrizePool();
             const winnerWithPrize = {
               ...result.winner,
-              prize: treasuryBalance
+              prize: treasuryBalance,
+              gameId: `round_end_${Date.now()}`
             };
             
             toast.success(
@@ -101,8 +119,8 @@ export const useJackpotRound = () => {
               { duration: 8000 }
             );
             
-            // Simulate the prize distribution for round end winners too
-            const distributed = await simulatePrizeDistribution(winnerWithPrize);
+            // Real prize distribution for round end winners
+            const distributed = await distributePrize(winnerWithPrize);
             
             // Initialize new round after distribution
             if (distributed) {
@@ -142,27 +160,28 @@ export const useJackpotRound = () => {
     setPrizePool(currentBalance);
     
     // TESTING: Award prize for ANY score (not just 100)
-    console.log('🎰 TESTING MODE: Awarding prize for any score!');
+    console.log('🎰 TESTING MODE: Awarding prize for any score with REAL distribution!');
     
     const winnerWithCurrentPrize = {
       player: gameEntry.player,
       score: gameEntry.score,
       prize: currentBalance,
-      winType: 'test_prize' as const
+      winType: 'test_prize' as const,
+      gameId: gameEntry.id
     };
     
-    console.log('TEST PRIZE! Simulating prize distribution:', winnerWithCurrentPrize);
+    console.log('REAL PRIZE DISTRIBUTION! Calling Edge Function:', winnerWithCurrentPrize);
     
     // Show immediate prize notification
-    toast.success(`🎰 TEST PRIZE! ${gameEntry.player.slice(0, 6)}...${gameEntry.player.slice(-4)} scored ${gameEntry.score}! Simulating ${currentBalance.toFixed(2)} SOL distribution...`, {
+    toast.success(`🎰 JACKPOT! ${gameEntry.player.slice(0, 6)}...${gameEntry.player.slice(-4)} scored ${gameEntry.score}! Initiating ${currentBalance.toFixed(2)} SOL transfer...`, {
       duration: 8000
     });
     
-    // Simulate the prize distribution immediately
-    const distributed = await simulatePrizeDistribution(winnerWithCurrentPrize);
+    // Real prize distribution immediately
+    const distributed = await distributePrize(winnerWithCurrentPrize);
     
     if (distributed) {
-      // Initialize new round with current treasury balance after simulation
+      // Initialize new round with current treasury balance after distribution
       setTimeout(async () => {
         const newBalance = await JackpotSystem.getPrizePool();
         const newRound = JackpotSystem.initializeRound(newBalance);

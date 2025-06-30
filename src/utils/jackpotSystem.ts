@@ -85,19 +85,10 @@ export class JackpotSystem {
     // Add game to round
     round.games.push(game);
     
-    // TESTING: Award prize for ANY score (removed the score === 100 check)
-    const treasuryBalance = await this.getPrizePool();
-    game.prize = treasuryBalance;
-    round.winner = {
-      player: game.player,
-      score: game.score,
-      prize: treasuryBalance,
-      winType: 'test_prize'
-    };
+    // Save updated round
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(round));
     
-    // End round immediately on any game for testing
-    await this.endRoundAsync(round);
-    return this.initializeRound(0);
+    return round;
   }
 
   static isRoundExpired(round: RoundData): boolean {
