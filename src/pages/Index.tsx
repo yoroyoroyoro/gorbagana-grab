@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import GameArea from '@/components/GameArea';
@@ -98,7 +97,7 @@ const Index = () => {
     }
 
     if (gorBalance < 0.05) {
-      toast.error('Insufficient GOR balance. You need at least 0.05 GOR to play.');
+      toast.error('Insufficient balance. You need at least 0.05 SOL to play.');
       return;
     }
 
@@ -107,10 +106,10 @@ const Index = () => {
     try {
       const fromPubkey = new PublicKey(publicKey);
       
-      console.log('Creating payment transaction for 0.05 GOR...');
+      console.log('Creating payment transaction for 0.05 SOL...');
       console.log('From:', fromPubkey.toString());
       console.log('To:', gorConnection.getTreasuryWallet().toString());
-      console.log('Current balance:', gorBalance.toFixed(4), 'GOR');
+      console.log('Current balance:', gorBalance.toFixed(4), 'SOL');
       
       // Create the payment transaction
       const transaction = await gorConnection.createGamePaymentTransaction(fromPubkey, 0.05);
@@ -126,7 +125,7 @@ const Index = () => {
       const signature = await gorConnection.sendTransaction(signedTransaction, fromPubkey);
       
       console.log('Payment transaction successful:', signature);
-      toast.success('Payment of 0.05 GOR processed! Game starting...', {
+      toast.success('Payment of 0.05 SOL processed! Game starting...', {
         description: `Transaction: ${signature.slice(0, 8)}...${signature.slice(-8)}`
       });
       
@@ -142,7 +141,7 @@ const Index = () => {
       console.error('Payment failed:', error);
       
       if (error.message?.includes('Insufficient balance')) {
-        toast.error('Insufficient GOR balance. Please add more GOR to your wallet.');
+        toast.error('Insufficient balance. Please add more SOL to your wallet.');
       } else if (error.message?.includes('User rejected')) {
         toast.error('Transaction cancelled by user.');
       } else {
@@ -178,7 +177,7 @@ const Index = () => {
     // Check if this game won something
     const winnerGame = updatedRound.games.find(g => g.id === gameEntry.id);
     if (winnerGame && winnerGame.prize > 0) {
-      toast.success(`INSTANT JACKPOT! You won ${winnerGame.prize.toFixed(2)} GOR!`);
+      toast.success(`INSTANT JACKPOT! You won ${winnerGame.prize.toFixed(2)} SOL!`);
       
       updateStatsForGame(score, winnerGame.prize);
       
@@ -265,10 +264,10 @@ const Index = () => {
           <div className="text-center mt-8">
             <div className="clean-card border-red-400/50 bg-red-900/30">
               <p className="text-red-300 pixel-font">
-                NEED 0.05 GOR TO PLAY
+                NEED 0.05 SOL TO PLAY
               </p>
               <p className="text-red-500 pixel-font text-sm mt-2">
-                Current balance: {gorBalance.toFixed(4)} GOR
+                Current balance: {gorBalance.toFixed(4)} SOL
               </p>
             </div>
           </div>

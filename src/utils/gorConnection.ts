@@ -1,4 +1,3 @@
-
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 // Gorbagana testnet RPC endpoint (HTTPS)
@@ -17,7 +16,7 @@ export class GorConnection {
   async getBalance(publicKey: PublicKey): Promise<number> {
     try {
       const balance = await this.connection.getBalance(publicKey);
-      return balance / LAMPORTS_PER_SOL; // Convert from lamports to SOL
+      return balance / LAMPORTS_PER_SOL; // Convert from lamports to SOL equivalent
     } catch (error) {
       console.error('Failed to get balance:', error);
       throw error;
@@ -26,14 +25,9 @@ export class GorConnection {
 
   async sendTransaction(transaction: Transaction, publicKey: PublicKey): Promise<string> {
     try {
-      // Add recent blockhash and set fee payer
-      const { blockhash } = await this.connection.getLatestBlockhash();
-      transaction.recentBlockhash = blockhash;
-      transaction.feePayer = publicKey;
-
-      // Send transaction
+      // Send transaction directly - wallet will handle signing
       const signature = await this.connection.sendRawTransaction(transaction.serialize());
-      await this.connection.confirmTransaction(signature);
+      await this.connection.confirmTransaction(signature, 'confirmed');
       
       return signature;
     } catch (error) {
@@ -47,20 +41,20 @@ export class GorConnection {
       // Verify the sender has sufficient balance
       const balance = await this.getBalance(fromPubkey);
       if (balance < amount) {
-        throw new Error(`Insufficient balance. Required: ${amount} GOR, Available: ${balance.toFixed(2)} GOR`);
+        throw new Error(`Insufficient balance. Required: ${amount} SOL, Available: ${balance.toFixed(4)} SOL`);
       }
 
-      // Create the transaction
+      // Create the transaction - this will show as SOL in the wallet
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey,
           toPubkey: GAME_TREASURY_WALLET,
-          lamports: Math.floor(amount * LAMPORTS_PER_SOL), // Ensure integer lamports
+          lamports: Math.floor(amount * LAMPORTS_PER_SOL), // Convert SOL amount to lamports
         })
       );
 
-      // Get recent blockhash
-      const { blockhash } = await this.connection.getLatestBlockhash();
+      // Get recent blockhash and set fee payer
+      const { blockhash } = await this.connection.getRecentBlockhash('confirmed');
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = fromPubkey;
 
