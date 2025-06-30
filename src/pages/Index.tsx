@@ -85,6 +85,10 @@ const Index = () => {
       setTimeRemaining(remaining);
 
       if (remaining <= 0) {
+        // Clear session leaderboard BEFORE ending the round
+        setSessionLeaderboard([]);
+        localStorage.removeItem(`sessionLeaderboard_${round.roundId}`);
+        
         // Check and end expired round
         const result = JackpotSystem.checkAndEndExpiredRound();
         if (result.roundEnded) {
@@ -100,9 +104,6 @@ const Index = () => {
           const newRound = JackpotSystem.initializeRound(0);
           setPrizePool(newRound.prizePool);
           setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
-          // Clear session leaderboard immediately and from localStorage
-          setSessionLeaderboard([]);
-          localStorage.removeItem(`sessionLeaderboard_${round.roundId}`);
         }
       }
     }, 1000);
@@ -274,8 +275,10 @@ const Index = () => {
     const currentRound = JackpotSystem.getCurrentRound();
     const currentRoundId = currentRound?.roundId;
 
-    // Update session leaderboard first
-    updateSessionLeaderboard(publicKey!, score);
+    // Update session leaderboard first (only if not a jackpot)
+    if (score !== 100) {
+      updateSessionLeaderboard(publicKey!, score);
+    }
 
     // Add game to jackpot system
     const updatedRound = JackpotSystem.addGameToRound(gameEntry, 0.05);
