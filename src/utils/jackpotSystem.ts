@@ -1,4 +1,3 @@
-
 import { gorConnection } from './gorConnection';
 
 interface GameEntry {
@@ -19,7 +18,7 @@ interface RoundData {
     player: string;
     score: number;
     prize: number;
-    winType: 'jackpot' | 'highest_score';
+    winType: 'jackpot' | 'highest_score' | 'test_prize';
   };
 }
 
@@ -86,25 +85,19 @@ export class JackpotSystem {
     // Add game to round
     round.games.push(game);
     
-    // Check for instant jackpot
-    if (game.score === 100) {
-      // Award ALL treasury funds to jackpot winner
-      const treasuryBalance = await this.getPrizePool();
-      game.prize = treasuryBalance;
-      round.winner = {
-        player: game.player,
-        score: game.score,
-        prize: treasuryBalance,
-        winType: 'jackpot'
-      };
-      
-      // End round immediately on jackpot
-      await this.endRoundAsync(round);
-      return this.initializeRound(0);
-    }
-
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(round));
-    return round;
+    // TESTING: Award prize for ANY score (removed the score === 100 check)
+    const treasuryBalance = await this.getPrizePool();
+    game.prize = treasuryBalance;
+    round.winner = {
+      player: game.player,
+      score: game.score,
+      prize: treasuryBalance,
+      winType: 'test_prize'
+    };
+    
+    // End round immediately on any game for testing
+    await this.endRoundAsync(round);
+    return this.initializeRound(0);
   }
 
   static isRoundExpired(round: RoundData): boolean {
