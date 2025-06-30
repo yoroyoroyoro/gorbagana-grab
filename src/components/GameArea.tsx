@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -104,7 +105,7 @@ const GameArea = ({ isPlaying, onStop, onStartGame, canPlay }: GameAreaProps) =>
             <div 
               className="absolute top-1 w-20 h-20 transition-none z-20 flex items-center justify-center"
               style={{ 
-                left: `calc(${cursorPosition}% - 40px)`, // Center the character
+                left: `calc(${Math.max(0, Math.min(cursorPosition, 100))}% - 40px + ${cursorPosition * 0.8}px)`, // Adjust positioning to keep character fully visible
                 filter: 'drop-shadow(0 0 10px rgba(32, 178, 170, 0.8))'
               }}
             >
