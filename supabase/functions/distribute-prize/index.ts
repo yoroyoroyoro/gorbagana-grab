@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Connection, Keypair, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from 'https://esm.sh/@solana/web3.js@1.98.2'
@@ -61,46 +62,11 @@ serve(async (req) => {
       wsEndpoint: undefined
     });
     
-    // Try multiple possible names for the treasury private key
-    console.log('🔍 Checking for treasury private key with multiple names...');
-    
-    const possibleKeyNames = [
-      'TREASURY_PRIVATE_KEY',
-      'TREASURY_WALLET_PRIVATE_KEY', 
-      'TREASURY_SECRET_KEY',
-      'TREASURY_KEY'
-    ];
-    
-    let treasuryPrivateKey: string | undefined;
-    let foundKeyName: string | undefined;
-    
-    for (const keyName of possibleKeyNames) {
-      const key = Deno.env.get(keyName);
-      if (key) {
-        treasuryPrivateKey = key;
-        foundKeyName = keyName;
-        console.log(`✅ Found treasury key with name: ${keyName}`);
-        break;
-      }
-    }
-    
-    // Debug logging for environment variables (without exposing the key)
-    const allEnvKeys = Object.keys(Deno.env.toObject());
-    console.log('📋 Available environment variables:', allEnvKeys);
-    console.log('🔑 Treasury key exists:', !!treasuryPrivateKey);
-    console.log('🔑 Treasury key length:', treasuryPrivateKey?.length || 0);
-    console.log('🔑 Found with key name:', foundKeyName || 'none');
+    // Get treasury private key
+    const treasuryPrivateKey = Deno.env.get('TREASURY_PRIVATE_KEY');
     
     if (!treasuryPrivateKey) {
       console.error('❌ Treasury private key not found in environment');
-      console.error('❌ Tried these key names:', possibleKeyNames);
-      console.error('❌ Available keys containing "TREASURY" or "PRIVATE":', 
-        allEnvKeys.filter(key => 
-          key.toUpperCase().includes('TREASURY') || 
-          key.toUpperCase().includes('PRIVATE') ||
-          key.toUpperCase().includes('KEY')
-        )
-      );
       
       await supabaseClient
         .from('prize_distributions')
@@ -110,40 +76,57 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Treasury configuration error - Private key not found', 
-          success: false,
-          debug: {
-            triedNames: possibleKeyNames,
-            availableKeys: allEnvKeys.filter(key => 
-              key.toUpperCase().includes('TREASURY') || 
-              key.toUpperCase().includes('PRIVATE') ||
-              key.toUpperCase().includes('KEY')
-            ),
-            keyExists: !!treasuryPrivateKey
-          }
+          success: false
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Import base58 for proper key decoding
-    const { decode: bs58decode } = await import('https://esm.sh/bs58@5.0.0');
-    
     let treasuryKeypair: Keypair;
     try {
       console.log('🔓 Attempting to decode treasury private key...');
-      console.log('🔑 Key length check:', treasuryPrivateKey.length);
-      console.log('🔑 Key starts with:', treasuryPrivateKey.substring(0, 10) + '...');
       
-      // Decode the base58 private key
-      const privateKeyBytes = bs58decode(treasuryPrivateKey);
+      // Convert base58 string to Uint8Array using a simple base58 decoder
+      // Since we can't reliably import bs58, we'll implement a basic decoder
+      const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+      
+      function base58Decode(str: string): Uint8Array {
+        let bytes = [0];
+        for (let i = 0; i < str.length; i++) {
+          const c = str[i];
+          const p = alphabet.indexOf(c);
+          if (p === -1) throw new Error('Invalid character in base58 string');
+          
+          let carry = p;
+          let j = 0;
+          while (j < bytes.length || carry) {
+            const val = (bytes[j] || 0) * 58 + carry;
+            bytes[j] = val & 0xff;
+            carry = Math.floor(val / 256);
+            j++;
+          }
+        }
+        
+        // Count leading zeros
+        let leadingZeros = 0;
+        for (let i = 0; i < str.length && str[i] === '1'; i++) {
+          leadingZeros++;
+        }
+        
+        // Create result array
+        const result = new Uint8Array(leadingZeros + bytes.length);
+        result.set(bytes.reverse(), leadingZeros);
+        
+        return result;
+      }
+      
+      const privateKeyBytes = base58Decode(treasuryPrivateKey);
       console.log('🔑 Decoded key byte length:', privateKeyBytes.length);
       
       treasuryKeypair = Keypair.fromSecretKey(privateKeyBytes);
       console.log('🔑 Treasury wallet loaded successfully:', treasuryKeypair.publicKey.toString());
     } catch (keyError) {
       console.error('❌ Failed to decode treasury private key:', keyError);
-      console.error('❌ Key format error - ensure it is a valid base58 private key');
-      console.error('❌ Your key format looks like this:', treasuryPrivateKey?.substring(0, 20) + '...' + treasuryPrivateKey?.substring(-10));
       
       await supabaseClient
         .from('prize_distributions')
@@ -154,8 +137,7 @@ serve(async (req) => {
         JSON.stringify({ 
           error: 'Treasury key decoding error - Invalid private key format', 
           success: false,
-          details: keyError.message,
-          keyPreview: treasuryPrivateKey?.substring(0, 20) + '...' + treasuryPrivateKey?.substring(-10)
+          details: keyError.message
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
