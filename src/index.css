@@ -44,7 +44,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Press Start 2P', monospace;
-    font-size: 12px;
+    font-size: clamp(8px, 2vw, 12px);
     line-height: 1.6;
     background-image: url('/lovable-uploads/b5868980-a9d4-4d82-af89-852e2bd641eb.png');
     background-size: cover;
@@ -73,30 +73,30 @@
 }
 
 @layer components {
-  /* Clean pixel typography */
+  /* Responsive pixel typography */
   .pixel-font {
     font-family: 'Press Start 2P', monospace;
-    font-size: 10px;
+    font-size: clamp(8px, 1.5vw, 10px);
     line-height: 1.8;
   }
 
   .pixel-font-lg {
     font-family: 'Press Start 2P', monospace;
-    font-size: 12px;
+    font-size: clamp(10px, 2vw, 12px);
     line-height: 2;
   }
 
   .pixel-font-xl {
     font-family: 'Press Start 2P', monospace;
-    font-size: 16px;
+    font-size: clamp(12px, 3vw, 16px);
     line-height: 2.2;
   }
 
-  /* Clean card styling with cyberpunk colors */
+  /* Responsive card styling with cyberpunk colors */
   .clean-card {
     background: rgba(22, 40, 50, 0.85);
     border: 2px solid rgba(64, 224, 160, 0.3);
-    padding: 16px 24px;
+    padding: clamp(12px, 3vw, 24px) clamp(16px, 4vw, 32px);
     backdrop-filter: blur(10px);
   }
 
@@ -105,16 +105,17 @@
     border: 2px solid rgba(64, 224, 160, 0.4);
   }
 
-  /* Clean button styling with cyberpunk theme */
+  /* Responsive button styling with cyberpunk theme */
   .pixel-pill {
     background: rgba(22, 40, 50, 0.8);
     border: 2px solid rgba(64, 224, 160, 0.4);
     color: rgb(64, 224, 160);
     font-family: 'Press Start 2P', monospace;
-    font-size: 10px;
-    padding: 12px 20px;
+    font-size: clamp(8px, 1.5vw, 10px);
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
     backdrop-filter: blur(10px);
     transition: all 0.2s ease;
+    white-space: nowrap;
   }
 
   .pixel-pill:hover {
@@ -129,8 +130,8 @@
     border: 2px solid rgba(64, 224, 160, 0.6);
     color: white;
     font-family: 'Press Start 2P', monospace;
-    font-size: 12px;
-    padding: 16px 32px;
+    font-size: clamp(10px, 2vw, 12px);
+    padding: clamp(12px, 3vw, 16px) clamp(20px, 5vw, 32px);
     transition: all 0.2s ease;
   }
 
@@ -140,12 +141,14 @@
     background: linear-gradient(135deg, rgba(32, 178, 170, 1), rgba(0, 191, 165, 1));
   }
 
-  /* Game specific styling with cyberpunk theme */
+  /* Responsive game container */
   .game-container {
     background: rgba(16, 35, 45, 0.9);
     border: 3px solid rgba(64, 224, 160, 0.4);
     backdrop-filter: blur(15px);
-    padding: 32px;
+    padding: clamp(16px, 4vw, 32px);
+    margin: 0 auto;
+    max-width: 100%;
   }
 
   .jackpot-zone {
@@ -168,20 +171,21 @@
       0 0 15px rgba(32, 178, 170, 0.5);
   }
 
-  /* Progress tiles with cyberpunk styling */
+  /* Responsive progress tiles */
   .pixel-progress {
     display: grid;
-    grid-template-columns: repeat(20, 1fr);
-    gap: 2px;
-    height: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(8px, 1fr));
+    gap: clamp(1px, 0.5vw, 2px);
+    height: clamp(16px, 4vw, 20px);
     background: rgba(16, 35, 45, 0.8);
     border: 2px solid rgba(64, 224, 160, 0.4);
-    padding: 4px;
+    padding: clamp(2px, 1vw, 4px);
   }
 
   .pixel-progress-tile {
     background: rgba(30, 50, 60, 0.6);
     transition: all 0.2s ease;
+    min-width: 4px;
   }
 
   .pixel-progress-tile.active {
@@ -189,7 +193,7 @@
     box-shadow: 0 0 8px rgba(32, 178, 170, 0.8);
   }
 
-  /* Page container styling for consistency */
+  /* Responsive page container */
   .page-container {
     min-height: 100vh;
     background-image: url('/lovable-uploads/b5868980-a9d4-4d82-af89-852e2bd641eb.png');
@@ -197,6 +201,7 @@
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
+    padding: clamp(8px, 2vw, 16px);
   }
 
   .page-container::before {
@@ -210,10 +215,78 @@
     backdrop-filter: blur(1px);
     z-index: -1;
   }
+
+  /* Mobile-specific adjustments */
+  @media (max-width: 768px) {
+    .pixel-font {
+      font-size: 8px;
+      line-height: 1.6;
+    }
+    
+    .pixel-font-lg {
+      font-size: 10px;
+      line-height: 1.8;
+    }
+    
+    .pixel-font-xl {
+      font-size: 12px;
+      line-height: 2;
+    }
+    
+    .clean-card {
+      padding: 12px 16px;
+    }
+    
+    .pixel-pill {
+      padding: 8px 12px;
+      font-size: 8px;
+    }
+    
+    .pixel-button-primary {
+      padding: 12px 20px;
+      font-size: 10px;
+    }
+    
+    .game-container {
+      padding: 16px;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .pixel-font {
+      font-size: 9px;
+    }
+    
+    .pixel-font-lg {
+      font-size: 11px;
+    }
+    
+    .pixel-font-xl {
+      font-size: 14px;
+    }
+  }
+
+  /* Large screen adjustments */
+  @media (min-width: 1920px) {
+    .pixel-font {
+      font-size: 12px;
+    }
+    
+    .pixel-font-lg {
+      font-size: 14px;
+    }
+    
+    .pixel-font-xl {
+      font-size: 18px;
+    }
+  }
 }
 
 .pixel-art {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+  max-width: 100%;
+  height: auto;
 }

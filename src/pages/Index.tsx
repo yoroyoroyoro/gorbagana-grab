@@ -223,40 +223,44 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Navigation Pills */}
-      <NavigationPills 
-        isConnected={isConnected}
-        publicKey={publicKey}
-        onConnect={handleConnectWallet}
-        onDisconnect={handleDisconnectWallet}
-      />
+      {/* Navigation Pills - Responsive positioning */}
+      <div className="absolute top-2 sm:top-6 right-2 sm:right-6 z-20">
+        <NavigationPills 
+          isConnected={isConnected}
+          publicKey={publicKey}
+          onConnect={handleConnectWallet}
+          onDisconnect={handleDisconnectWallet}
+        />
+      </div>
 
-      {/* Session Leaderboard */}
-      <div className="absolute top-20 right-6 z-20">
+      {/* Session Leaderboard - Responsive positioning */}
+      <div className="absolute top-16 sm:top-20 right-2 sm:right-6 z-20">
         <SessionLeaderboard players={sessionLeaderboard} />
       </div>
       
-      <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
+      <div className="relative z-10 container mx-auto px-2 sm:px-4 py-4 sm:py-20 max-w-6xl">
         {/* Header */}
         <div className="text-center mb-4">
-          <div className="flex justify-center items-center gap-6 mb-2">
+          <div className="flex justify-center items-center gap-2 sm:gap-6 mb-2">
             <img 
               src="/lovable-uploads/afc917a3-89e5-4c59-bf83-19bbecee4d72.png" 
               alt="Gorbagana Grab" 
-              className="w-auto h-96 pixel-art"
+              className="w-auto h-48 sm:h-64 md:h-80 lg:h-96 pixel-art"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
               }}
             />
           </div>
 
-          {/* Game Stats */}
-          <GameStats 
-            prizePool={prizePool}
-            timeRemaining={formatTime()}
-            gorBalance={gorBalance}
-            isConnected={isConnected}
-          />
+          {/* Game Stats - Responsive grid */}
+          <div className="mb-6">
+            <GameStats 
+              prizePool={prizePool}
+              timeRemaining={formatTime()}
+              gorBalance={gorBalance}
+              isConnected={isConnected}
+            />
+          </div>
         </div>
 
         {/* Game Area */}
@@ -271,7 +275,7 @@ const Index = () => {
 
         {/* Processing Payment */}
         {isProcessingPayment && (
-          <div className="text-center mt-8">
+          <div className="text-center mt-4 sm:mt-8 px-2">
             <div className="clean-card border-yellow-400/50 bg-yellow-900/30">
               <p className="text-yellow-300 pixel-font">
                 PROCESSING PAYMENT...
@@ -285,7 +289,7 @@ const Index = () => {
 
         {/* Balance Warning */}
         {isConnected && balanceLoaded && gorBalance < 0.05 && (
-          <div className="text-center mt-8">
+          <div className="text-center mt-4 sm:mt-8 px-2">
             <div className="clean-card border-red-400/50 bg-red-900/30">
               <p className="text-red-300 pixel-font">
                 NEED 0.05 SOL TO PLAY
