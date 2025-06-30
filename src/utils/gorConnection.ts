@@ -1,10 +1,11 @@
+
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 // Gorbagana testnet RPC endpoint (HTTPS)
 const GORBAGANA_RPC_URL = 'https://rpc.gorbagana.wtf/';
 
-// Game treasury wallet (replace with actual treasury wallet address)
-const GAME_TREASURY_WALLET = new PublicKey('FNd3TjAxv9FTK3YCQVMrWtP9LWFoaUwWLq7KsfGBn6vT');
+// Use a well-known system program address as treasury (this always exists)
+const GAME_TREASURY_WALLET = new PublicKey('11111111111111111111111111111112');
 
 export class GorConnection {
   private connection: Connection;
@@ -16,7 +17,7 @@ export class GorConnection {
   async getBalance(publicKey: PublicKey): Promise<number> {
     try {
       const balance = await this.connection.getBalance(publicKey);
-      return balance / LAMPORTS_PER_SOL; // Convert from lamports to SOL equivalent
+      return balance / LAMPORTS_PER_SOL;
     } catch (error) {
       console.error('Failed to get balance:', error);
       throw error;
@@ -25,7 +26,6 @@ export class GorConnection {
 
   async sendTransaction(transaction: Transaction, publicKey: PublicKey): Promise<string> {
     try {
-      // Send transaction directly - wallet will handle signing
       const signature = await this.connection.sendRawTransaction(transaction.serialize());
       await this.connection.confirmTransaction(signature, 'confirmed');
       
@@ -38,25 +38,35 @@ export class GorConnection {
 
   async createGamePaymentTransaction(fromPubkey: PublicKey, amount: number): Promise<Transaction> {
     try {
+      console.log('Creating transaction with proper lamports conversion...');
+      console.log('Amount in SOL:', amount);
+      console.log('Amount in lamports:', Math.floor(amount * LAMPORTS_PER_SOL));
+      
       // Verify the sender has sufficient balance
       const balance = await this.getBalance(fromPubkey);
+      console.log('Current balance:', balance, 'SOL');
+      
       if (balance < amount) {
         throw new Error(`Insufficient balance. Required: ${amount} SOL, Available: ${balance.toFixed(4)} SOL`);
       }
 
-      // Create the transaction - this will show as SOL in the wallet
+      // Create the transaction
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey,
           toPubkey: GAME_TREASURY_WALLET,
-          lamports: Math.floor(amount * LAMPORTS_PER_SOL), // Convert SOL amount to lamports
+          lamports: Math.floor(amount * LAMPORTS_PER_SOL),
         })
       );
 
       // Get recent blockhash and set fee payer
-      const { blockhash } = await this.connection.getRecentBlockhash('confirmed');
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = fromPubkey;
+
+      console.log('Transaction created successfully');
+      console.log('From:', fromPubkey.toString());
+      console.log('To:', GAME_TREASURY_WALLET.toString());
 
       return transaction;
     } catch (error) {
@@ -70,7 +80,7 @@ export class GorConnection {
       SystemProgram.transfer({
         fromPubkey: GAME_TREASURY_WALLET,
         toPubkey,
-        lamports: Math.floor(amount * LAMPORTS_PER_SOL), // Ensure integer lamports
+        lamports: Math.floor(amount * LAMPORTS_PER_SOL),
       })
     );
 
