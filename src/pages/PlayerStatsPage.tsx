@@ -1,37 +1,14 @@
 
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PlayerStats from '@/components/PlayerStats';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
-
-interface PlayerData {
-  walletAddress: string;
-  totalWinnings: number;
-  gamesPlayed: number;
-  bestScore: number;
-  winRate: number;
-}
+import { usePlayerStats } from '@/hooks/usePlayerStats';
 
 const PlayerStatsPage = () => {
   const { isConnected, publicKey } = useBackpackWallet();
-  const [playerStats, setPlayerStats] = useState<PlayerData>({
-    walletAddress: '',
-    totalWinnings: 0,
-    gamesPlayed: 0,
-    bestScore: 0,
-    winRate: 0
-  });
-
-  useEffect(() => {
-    if (isConnected && publicKey) {
-      const savedStats = localStorage.getItem(`playerStats_${publicKey}`);
-      if (savedStats) {
-        setPlayerStats(JSON.parse(savedStats));
-      }
-    }
-  }, [isConnected, publicKey]);
+  const { playerStats } = usePlayerStats(publicKey);
 
   return (
     <div className="page-container">
