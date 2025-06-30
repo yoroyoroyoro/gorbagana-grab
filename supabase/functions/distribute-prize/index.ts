@@ -62,17 +62,34 @@ serve(async (req) => {
       wsEndpoint: undefined
     });
     
-    // Get treasury private key from environment
+    // Get treasury private key from environment with better debugging
+    console.log('🔍 Checking for treasury private key...');
     const treasuryPrivateKey = Deno.env.get('TREASURY_PRIVATE_KEY');
+    
+    // Debug logging for environment variables (without exposing the key)
+    const allEnvKeys = Object.keys(Deno.env.toObject());
+    console.log('📋 Available environment variables:', allEnvKeys);
+    console.log('🔑 Treasury key exists:', !!treasuryPrivateKey);
+    console.log('🔑 Treasury key length:', treasuryPrivateKey?.length || 0);
+    
     if (!treasuryPrivateKey) {
       console.error('❌ Treasury private key not found in environment');
+      console.error('❌ Available env vars:', allEnvKeys.filter(key => key.includes('TREASURY') || key.includes('PRIVATE')));
+      
       await supabaseClient
         .from('prize_distributions')
         .update({ status: 'failed' })
         .eq('id', prizeRecord.id);
       
       return new Response(
-        JSON.stringify({ error: 'Treasury configuration error', success: false }),
+        JSON.stringify({ 
+          error: 'Treasury configuration error - Private key not found', 
+          success: false,
+          debug: {
+            availableKeys: allEnvKeys.filter(key => key.includes('TREASURY') || key.includes('PRIVATE')),
+            keyExists: !!treasuryPrivateKey
+          }
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -82,19 +99,26 @@ serve(async (req) => {
     
     let treasuryKeypair: Keypair;
     try {
+      console.log('🔓 Attempting to decode treasury private key...');
       // Decode the base58 private key
       const privateKeyBytes = bs58decode(treasuryPrivateKey);
       treasuryKeypair = Keypair.fromSecretKey(privateKeyBytes);
-      console.log('🔑 Treasury wallet loaded:', treasuryKeypair.publicKey.toString());
+      console.log('🔑 Treasury wallet loaded successfully:', treasuryKeypair.publicKey.toString());
     } catch (keyError) {
       console.error('❌ Failed to decode treasury private key:', keyError);
+      console.error('❌ Key format error - ensure it is a valid base58 private key');
+      
       await supabaseClient
         .from('prize_distributions')
         .update({ status: 'failed' })
         .eq('id', prizeRecord.id);
       
       return new Response(
-        JSON.stringify({ error: 'Treasury key decoding error', success: false }),
+        JSON.stringify({ 
+          error: 'Treasury key decoding error - Invalid private key format', 
+          success: false,
+          details: keyError.message
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
