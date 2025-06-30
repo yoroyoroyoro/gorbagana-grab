@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Connection, Keypair, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from 'https://esm.sh/@solana/web3.js@1.98.2'
@@ -62,19 +61,46 @@ serve(async (req) => {
       wsEndpoint: undefined
     });
     
-    // Get treasury private key from environment with better debugging
-    console.log('🔍 Checking for treasury private key...');
-    const treasuryPrivateKey = Deno.env.get('TREASURY_PRIVATE_KEY');
+    // Try multiple possible names for the treasury private key
+    console.log('🔍 Checking for treasury private key with multiple names...');
+    
+    const possibleKeyNames = [
+      'TREASURY_PRIVATE_KEY',
+      'TREASURY_WALLET_PRIVATE_KEY', 
+      'TREASURY_SECRET_KEY',
+      'TREASURY_KEY'
+    ];
+    
+    let treasuryPrivateKey: string | undefined;
+    let foundKeyName: string | undefined;
+    
+    for (const keyName of possibleKeyNames) {
+      const key = Deno.env.get(keyName);
+      if (key) {
+        treasuryPrivateKey = key;
+        foundKeyName = keyName;
+        console.log(`✅ Found treasury key with name: ${keyName}`);
+        break;
+      }
+    }
     
     // Debug logging for environment variables (without exposing the key)
     const allEnvKeys = Object.keys(Deno.env.toObject());
     console.log('📋 Available environment variables:', allEnvKeys);
     console.log('🔑 Treasury key exists:', !!treasuryPrivateKey);
     console.log('🔑 Treasury key length:', treasuryPrivateKey?.length || 0);
+    console.log('🔑 Found with key name:', foundKeyName || 'none');
     
     if (!treasuryPrivateKey) {
       console.error('❌ Treasury private key not found in environment');
-      console.error('❌ Available env vars:', allEnvKeys.filter(key => key.includes('TREASURY') || key.includes('PRIVATE')));
+      console.error('❌ Tried these key names:', possibleKeyNames);
+      console.error('❌ Available keys containing "TREASURY" or "PRIVATE":', 
+        allEnvKeys.filter(key => 
+          key.toUpperCase().includes('TREASURY') || 
+          key.toUpperCase().includes('PRIVATE') ||
+          key.toUpperCase().includes('KEY')
+        )
+      );
       
       await supabaseClient
         .from('prize_distributions')
@@ -86,7 +112,12 @@ serve(async (req) => {
           error: 'Treasury configuration error - Private key not found', 
           success: false,
           debug: {
-            availableKeys: allEnvKeys.filter(key => key.includes('TREASURY') || key.includes('PRIVATE')),
+            triedNames: possibleKeyNames,
+            availableKeys: allEnvKeys.filter(key => 
+              key.toUpperCase().includes('TREASURY') || 
+              key.toUpperCase().includes('PRIVATE') ||
+              key.toUpperCase().includes('KEY')
+            ),
             keyExists: !!treasuryPrivateKey
           }
         }),
@@ -100,13 +131,19 @@ serve(async (req) => {
     let treasuryKeypair: Keypair;
     try {
       console.log('🔓 Attempting to decode treasury private key...');
+      console.log('🔑 Key length check:', treasuryPrivateKey.length);
+      console.log('🔑 Key starts with:', treasuryPrivateKey.substring(0, 10) + '...');
+      
       // Decode the base58 private key
       const privateKeyBytes = bs58decode(treasuryPrivateKey);
+      console.log('🔑 Decoded key byte length:', privateKeyBytes.length);
+      
       treasuryKeypair = Keypair.fromSecretKey(privateKeyBytes);
       console.log('🔑 Treasury wallet loaded successfully:', treasuryKeypair.publicKey.toString());
     } catch (keyError) {
       console.error('❌ Failed to decode treasury private key:', keyError);
       console.error('❌ Key format error - ensure it is a valid base58 private key');
+      console.error('❌ Your key format looks like this:', treasuryPrivateKey?.substring(0, 20) + '...' + treasuryPrivateKey?.substring(-10));
       
       await supabaseClient
         .from('prize_distributions')
@@ -117,7 +154,8 @@ serve(async (req) => {
         JSON.stringify({ 
           error: 'Treasury key decoding error - Invalid private key format', 
           success: false,
-          details: keyError.message
+          details: keyError.message,
+          keyPreview: treasuryPrivateKey?.substring(0, 20) + '...' + treasuryPrivateKey?.substring(-10)
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
