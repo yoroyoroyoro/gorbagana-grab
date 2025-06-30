@@ -106,30 +106,46 @@ export const useJackpotRound = () => {
         const result = JackpotSystem.checkAndEndExpiredRound();
         if (result.roundEnded) {
           if (result.winner) {
-            // Get current treasury balance for the actual prize amount
-            const treasuryBalance = await JackpotSystem.getPrizePool();
-            const winnerWithPrize = {
-              ...result.winner,
-              prize: treasuryBalance,
-              gameId: `round_end_${Date.now()}`
-            };
+            // Check if there was already a jackpot winner (score 100) in this round
+            const hadJackpotWinner = round.games.some(game => game.score === 100);
             
-            toast.success(
-              `⏰ ROUND ENDED! ${winnerWithPrize.player.slice(0, 6)}...${winnerWithPrize.player.slice(-4)} won ${winnerWithPrize.prize.toFixed(2)} SOL with score ${winnerWithPrize.score}!`,
-              { duration: 8000 }
-            );
-            
-            // Real prize distribution for round end winners
-            const distributed = await distributePrize(winnerWithPrize);
-            
-            // Initialize new round after distribution
-            if (distributed) {
-              setTimeout(async () => {
-                const currentBalance = await JackpotSystem.getPrizePool();
-                const newRound = JackpotSystem.initializeRound(currentBalance);
-                setPrizePool(currentBalance);
-                setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
-              }, 3000);
+            if (!hadJackpotWinner) {
+              // Only distribute prize if NO jackpot winner occurred during the round
+              const treasuryBalance = await JackpotSystem.getPrizePool();
+              const winnerWithPrize = {
+                ...result.winner,
+                prize: treasuryBalance,
+                gameId: `round_end_${Date.now()}`
+              };
+              
+              toast.success(
+                `⏰ ROUND ENDED! ${winnerWithPrize.player.slice(0, 6)}...${winnerWithPrize.player.slice(-4)} won ${winnerWithPrize.prize.toFixed(2)} SOL with score ${winnerWithPrize.score}!`,
+                { duration: 8000 }
+              );
+              
+              // Real prize distribution for round end winners (only if no jackpot occurred)
+              const distributed = await distributePrize(winnerWithPrize);
+              
+              // Initialize new round after distribution
+              if (distributed) {
+                setTimeout(async () => {
+                  const currentBalance = await JackpotSystem.getPrizePool();
+                  const newRound = JackpotSystem.initializeRound(currentBalance);
+                  setPrizePool(currentBalance);
+                  setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
+                }, 3000);
+              }
+            } else {
+              // Round had a jackpot winner, so just show notification without prize distribution
+              toast.success(`⏰ ROUND ENDED! ${result.winner.player.slice(0, 6)}...${result.winner.player.slice(-4)} had the highest score (${result.winner.score}), but the jackpot was already won this round!`, {
+                duration: 8000
+              });
+              
+              // Initialize new round without prize distribution
+              const currentBalance = await JackpotSystem.getPrizePool();
+              const newRound = JackpotSystem.initializeRound(currentBalance);
+              setPrizePool(currentBalance);
+              setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
             }
           } else {
             toast.success('Round ended! No games were played.');
