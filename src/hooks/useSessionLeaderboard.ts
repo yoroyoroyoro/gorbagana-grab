@@ -76,9 +76,26 @@ export const useSessionLeaderboard = () => {
   };
 
   const clearSessionLeaderboard = (roundId?: string) => {
+    // Clear the state immediately
     setSessionLeaderboard([]);
+    
+    // Clear localStorage for specific round or current round
     if (roundId) {
       localStorage.removeItem(`sessionLeaderboard_${roundId}`);
+    } else {
+      const currentRound = JackpotSystem.getCurrentRound();
+      if (currentRound) {
+        localStorage.removeItem(`sessionLeaderboard_${currentRound.roundId}`);
+      }
+    }
+  };
+
+  const forceRefreshLeaderboard = () => {
+    const round = JackpotSystem.getCurrentRound();
+    if (round) {
+      loadSessionLeaderboard(round.roundId);
+    } else {
+      setSessionLeaderboard([]);
     }
   };
 
@@ -86,6 +103,7 @@ export const useSessionLeaderboard = () => {
     sessionLeaderboard,
     updateSessionLeaderboard,
     clearSessionLeaderboard,
-    loadSessionLeaderboard
+    loadSessionLeaderboard,
+    forceRefreshLeaderboard
   };
 };

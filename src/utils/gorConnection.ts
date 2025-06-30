@@ -39,12 +39,24 @@ export class GorConnection {
     }
   }
 
-  async createGamePaymentTransaction(fromPubkey: PublicKey, toPubkey: PublicKey, amount: number): Promise<Transaction> {
+  async createGamePaymentTransaction(fromPubkey: PublicKey, toPubkey: PublicKey, amount: number): Transaction {
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey,
         toPubkey,
         lamports: amount * LAMPORTS_PER_SOL, // Convert SOL to lamports
+      })
+    );
+
+    return transaction;
+  }
+
+  async createPrizeDistributionTransaction(fromPubkey: PublicKey, toPubkey: PublicKey, amount: number): Promise<Transaction> {
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports: amount * LAMPORTS_PER_SOL, // Convert GOR to lamports
       })
     );
 

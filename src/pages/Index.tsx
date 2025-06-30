@@ -33,11 +33,34 @@ const Index = () => {
 
   // Custom hooks
   const { prizePool, timeRemaining, formatTime, addGameToRound, resetTimeForNewRound } = useJackpotRound();
-  const { sessionLeaderboard, updateSessionLeaderboard, clearSessionLeaderboard } = useSessionLeaderboard();
+  const { sessionLeaderboard, updateSessionLeaderboard, clearSessionLeaderboard, forceRefreshLeaderboard } = useSessionLeaderboard();
   const { playerStats, updateStatsForGame, updateBestScore } = usePlayerStats(publicKey);
 
   // Modal state
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  // Listen for round events to clear session leaderboard
+  useEffect(() => {
+    const handleRoundEnded = () => {
+      console.log('Round ended - clearing session leaderboard');
+      clearSessionLeaderboard();
+      forceRefreshLeaderboard();
+    };
+
+    const handleJackpotWon = () => {
+      console.log('Jackpot won - clearing session leaderboard');
+      clearSessionLeaderboard();
+      forceRefreshLeaderboard();
+    };
+
+    window.addEventListener('roundEnded', handleRoundEnded);
+    window.addEventListener('jackpotWon', handleJackpotWon);
+
+    return () => {
+      window.removeEventListener('roundEnded', handleRoundEnded);
+      window.removeEventListener('jackpotWon', handleJackpotWon);
+    };
+  }, [clearSessionLeaderboard, forceRefreshLeaderboard]);
 
   // Check GOR balance when wallet connects
   useEffect(() => {
@@ -128,8 +151,8 @@ const Index = () => {
       
       updateStatsForGame(score, winnerGame.prize);
       
-      // JACKPOT RESET: Clear session leaderboard completely
-      clearSessionLeaderboard();
+      // Update balance to reflect the prize
+      setGorBalance(prev => prev + winnerGame.prize);
       
       // Reset time for new round
       resetTimeForNewRound();
