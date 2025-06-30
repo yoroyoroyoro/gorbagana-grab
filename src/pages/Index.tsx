@@ -346,13 +346,8 @@ const Index = () => {
         <Dialog open={isHelpModalOpen} onOpenChange={setIsHelpModalOpen}>
           <DialogTrigger asChild>
             <div className="relative cursor-pointer group">
-              {/* Animated "Click Me" Text - Properly centered above */}
-              <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-teal-300 pixel-font text-sm animate-bounce whitespace-nowrap">
-                CLICK ME
-              </div>
-              
-              {/* Help Icon - Made bigger with glow effect */}
-              <div className="w-32 h-32 hover:scale-110 transition-transform duration-200">
+              {/* Help Icon - Made bigger with glow effect and bounce animation */}
+              <div className="w-32 h-32 hover:scale-110 transition-transform duration-200 animate-bounce">
                 <img 
                   src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
                   alt="Help Character" 
