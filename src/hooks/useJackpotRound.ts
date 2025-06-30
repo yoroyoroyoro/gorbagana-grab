@@ -69,7 +69,7 @@ export const useJackpotRound = () => {
 
       if (data?.success) {
         console.log(`Prize distributed successfully! Transaction: ${data.transaction_signature}`);
-        toast.success(`🎉 JACKPOT PRIZE DISTRIBUTED! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} received ${data.actual_prize_amount?.toFixed(2) || winner.prize.toFixed(2)} SOL!`, {
+        toast.success(`🎉 PRIZE DISTRIBUTED! ${winner.player.slice(0, 6)}...${winner.player.slice(-4)} received ${data.actual_prize_amount?.toFixed(2) || winner.prize.toFixed(2)} SOL!`, {
           description: `Transaction: ${data.transaction_signature.slice(0, 8)}...${data.transaction_signature.slice(-8)}`,
           duration: 10000
         });
@@ -115,17 +115,30 @@ export const useJackpotRound = () => {
               { duration: 8000 }
             );
             
-            // Distribute the prize automatically
+            // Distribute the prize automatically for round end winners too
             await distributePrize(winnerWithPrize);
           } else {
             toast.success('Round ended! No games were played.');
+            
+            // Still initialize new round even if no winner
+            const currentBalance = await JackpotSystem.getPrizePool();
+            const newRound = JackpotSystem.initializeRound(currentBalance);
+            setPrizePool(currentBalance);
+            setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
           }
           
-          // Initialize new round with current treasury balance (should be 0 after distribution)
-          const currentBalance = await JackpotSystem.getPrizePool();
-          const newRound = JackpotSystem.initializeRound(currentBalance);
-          setPrizePool(currentBalance);
-          setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
+          // Only initialize new round here if there was no winner (to avoid double initialization)
+          if (!result.winner) {
+            // Already handled above in the else block
+          } else {
+            // Initialize new round with current treasury balance (should be 0 after distribution)
+            setTimeout(async () => {
+              const currentBalance = await JackpotSystem.getPrizePool();
+              const newRound = JackpotSystem.initializeRound(currentBalance);
+              setPrizePool(currentBalance);
+              setTimeRemaining(JackpotSystem.getTimeRemaining(newRound));
+            }, 3000); // Wait a bit for transaction to process
+          }
           
           // Trigger a custom event to notify other components
           window.dispatchEvent(new CustomEvent('roundEnded', { detail: result }));
