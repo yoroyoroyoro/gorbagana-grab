@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GameArea from '@/components/GameArea';
 import SessionLeaderboard from '@/components/SessionLeaderboard';
@@ -241,11 +240,14 @@ const Index = () => {
               onClick={() => setIsHelpModalOpen(true)}
               variant="outline"
               size="sm"
-              className="pixel-button border-teal-400/40 text-teal-400 hover:bg-teal-400/10"
+              className="pixel-button border-teal-400/40 text-teal-400 hover:bg-teal-400/10 p-2"
             >
-              <Info className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">HELP</span>
-              <span className="sm:hidden">?</span>
+              <img 
+                src="/lovable-uploads/b6841ba2-2007-45cb-baec-20c0b5880fe6.png" 
+                alt="Help" 
+                className="w-6 h-6 pixel-art"
+              />
+              <span className="hidden sm:inline ml-2">HELP</span>
             </Button>
           </div>
           
