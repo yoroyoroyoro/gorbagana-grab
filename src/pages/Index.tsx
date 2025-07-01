@@ -5,6 +5,7 @@ import GameArea from '@/components/GameArea';
 import SessionLeaderboard from '@/components/SessionLeaderboard';
 import NavigationPills from '@/components/NavigationPills';
 import GameStats from '@/components/GameStats';
+import PastWinners from '@/components/PastWinners';
 import HelpModal from '@/components/HelpModal';
 import { useBackpackWallet } from '@/hooks/useBackpackWallet';
 import { useJackpotRound } from '@/hooks/useJackpotRound';
@@ -293,6 +294,11 @@ const Index = () => {
               gorBalance={gorBalance}
               isConnected={isConnected}
             />
+          </div>
+
+          {/* Past Winners - Added between stats and game area */}
+          <div className="mb-6">
+            <PastWinners />
           </div>
         </div>
 
