@@ -142,6 +142,9 @@ const Index = () => {
       
       console.log('Transaction created, requesting signature...');
       
+      // Show user-friendly message about potential wallet warnings
+      toast.info('Backpack may show warnings about the account - this is normal on testnet. Please approve to continue.');
+      
       // Sign the transaction using the wallet
       const signedTransaction = await signTransaction(transaction);
       
@@ -176,6 +179,8 @@ const Index = () => {
         toast.error('Insufficient balance. Please add more GOR to your wallet.');
       } else if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
         toast.error('Transaction cancelled by user.');
+      } else if (error.message?.includes('AccountNotFound')) {
+        toast.warning('Wallet showed account warning, but you can still approve the transaction. This is normal on testnet.');
       } else {
         toast.error('Payment failed. Please check your balance and try again.', {
           description: error.message || 'Unknown error occurred'

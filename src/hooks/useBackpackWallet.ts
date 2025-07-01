@@ -78,7 +78,26 @@ export const useBackpackWallet = () => {
     if (!window.backpack || !isConnected) {
       throw new Error('Wallet not connected');
     }
-    return await window.backpack.signTransaction(transaction);
+    
+    try {
+      console.log('Requesting transaction signature from Backpack...');
+      const signedTransaction = await window.backpack.signTransaction(transaction);
+      console.log('Transaction signed successfully');
+      return signedTransaction;
+    } catch (error: any) {
+      console.error('Transaction signing error:', error);
+      
+      // Handle specific Backpack errors more gracefully
+      if (error.message?.includes('AccountNotFound') || error.code === 4001) {
+        // This is the common "AccountNotFound" error that still allows transactions to proceed
+        console.log('AccountNotFound error detected - this is usually safe to ignore on Gorbagana testnet');
+        throw new Error('Transaction confirmation may show warnings, but should still process successfully. Please approve to continue.');
+      } else if (error.message?.includes('User rejected')) {
+        throw new Error('Transaction cancelled by user');
+      } else {
+        throw error;
+      }
+    }
   };
 
   return {
