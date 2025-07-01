@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import GameArea from '@/components/GameArea';
 import SessionLeaderboard from '@/components/SessionLeaderboard';
 import NavigationPills from '@/components/NavigationPills';
@@ -233,7 +235,19 @@ const Index = () => {
       <div className="relative z-10 container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-6xl">
         {/* Top Navigation Bar - Fixed positioning to avoid overlap */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="flex-1"></div>
+          {/* Help Button */}
+          <div className="flex items-center">
+            <Button
+              onClick={() => setIsHelpModalOpen(true)}
+              variant="outline"
+              size="sm"
+              className="pixel-button border-teal-400/40 text-teal-400 hover:bg-teal-400/10"
+            >
+              <Info className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">HELP</span>
+              <span className="sm:hidden">?</span>
+            </Button>
+          </div>
           
           {/* Navigation Pills - Now in the flow */}
           <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 sm:gap-4 items-center">
