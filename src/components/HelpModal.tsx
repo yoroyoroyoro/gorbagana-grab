@@ -89,7 +89,7 @@ const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
           <section>
             <h3 className="text-slate-400 font-bold mb-2">🔧 TECHNICAL INFO</h3>
             <ul className="space-y-1 text-xs">
-              <li>• Built on Solana blockchain</li>
+              <li>• Built on GOR RPC network</li>
               <li>• Payments processed via Backpack wallet</li>
               <li>• Prize distribution is automatic</li>
               <li>• All transactions are verifiable on-chain</li>
