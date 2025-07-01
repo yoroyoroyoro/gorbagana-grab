@@ -45,6 +45,7 @@ const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
               <li>• All game payments go into a shared prize pool</li>
               <li>• <span className="text-teal-300">Perfect Score (100):</span> Win the ENTIRE prize pool instantly!</li>
               <li>• <span className="text-yellow-300">Round End:</span> Highest scorer wins the remaining pool</li>
+              <li>• <span className="text-orange-300">Tiebreaker:</span> If multiple players have the same highest score, the FIRST person to achieve that score wins</li>
             </ul>
           </section>
 
@@ -58,6 +59,7 @@ const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
                 <li>• <span className="text-yellow-300">Prize pool reset:</span> Prize pool resets to 0 GOR when a new round starts</li>
                 <li>• <span className="text-yellow-300">Fresh start:</span> Every player gets a clean slate each round</li>
                 <li>• <span className="text-yellow-300">Winner takes all:</span> Round winner gets the entire accumulated prize pool</li>
+                <li>• <span className="text-orange-300">Timing matters:</span> Being first to achieve the highest score gives you the advantage!</li>
               </ul>
             </div>
           </section>
@@ -82,6 +84,7 @@ const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
               <li>• Aim for the center of the trash can for maximum points</li>
               <li>• Early round = smaller prize pool, late round = bigger prizes</li>
               <li>• Perfect timing beats speed - focus on accuracy!</li>
+              <li>• <span className="text-orange-300">Play early if you're confident:</span> Being first to hit a high score secures your win!</li>
             </ul>
           </section>
 
