@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -8,68 +8,96 @@ interface HelpModalProps {
 
 const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
   return (
-    <div className="fixed bottom-8 right-8 z-30">
-      <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogTrigger asChild>
-          <div className="relative cursor-pointer group">
-            <div className="w-32 h-32 hover:scale-110 transition-transform duration-200 cursor-pointer">
-              <img 
-                src="/lovable-uploads/c69d84c3-2b69-430f-948c-8780de3594a6.png" 
-                alt="Help Character" 
-                className="w-full h-full pixel-art hover:brightness-125 transition-all duration-200"
-                style={{
-                  filter: 'drop-shadow(0 0 20px rgba(32, 178, 170, 0.8)) drop-shadow(0 0 40px rgba(32, 178, 170, 0.4)) drop-shadow(0 0 60px rgba(32, 178, 170, 0.2))',
-                }}
-              />
-            </div>
-          </div>
-        </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-slate-900 border-teal-400/40">
+        <DialogHeader>
+          <DialogTitle className="pixel-font text-teal-400 text-xl">How to Play Gorbagana Grab</DialogTitle>
+        </DialogHeader>
         
-        <DialogContent className="max-w-lg bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-slate-800/95 border-teal-400/40 text-slate-100 backdrop-blur-sm">
-          <DialogHeader>
-            <DialogTitle className="pixel-font text-2xl text-teal-300 text-center mb-4">
-              ROUND SYSTEM GUIDE
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="pixel-font text-sm space-y-6 mt-6">
-            <div className="p-4 bg-teal-900/30 rounded-lg border border-teal-400/30">
-              <h3 className="text-teal-300 font-bold mb-2">Perfect Hit Jackpot</h3>
-              <p className="text-slate-300">Score exactly 100 points to instantly win the entire prize pool!</p>
+        <div className="space-y-6 text-slate-300 pixel-font text-sm">
+          {/* Game Basics */}
+          <section>
+            <h3 className="text-teal-400 font-bold mb-2">🎮 GAME BASICS</h3>
+            <ul className="space-y-1 text-xs">
+              <li>• Connect your Backpack wallet to play</li>
+              <li>• Each game costs 0.05 SOL to play</li>
+              <li>• Time your tap to hit the moving trash can target</li>
+              <li>• Score is based on accuracy (0-100 points)</li>
+            </ul>
+          </section>
+
+          {/* Scoring System */}
+          <section>
+            <h3 className="text-teal-400 font-bold mb-2">🎯 SCORING SYSTEM</h3>
+            <ul className="space-y-1 text-xs">
+              <li>• <span className="text-red-300">0-49 points:</span> Keep trying!</li>
+              <li>• <span className="text-yellow-300">50-69 points:</span> Good attempt</li>
+              <li>• <span className="text-emerald-300">70-89 points:</span> Great shot!</li>
+              <li>• <span className="text-cyan-300">90-99 points:</span> Excellent!</li>
+              <li>• <span className="text-teal-300">100 points:</span> INSTANT JACKPOT! 🎰</li>
+            </ul>
+          </section>
+
+          {/* Prize System */}
+          <section>
+            <h3 className="text-teal-400 font-bold mb-2">💰 PRIZE SYSTEM</h3>
+            <ul className="space-y-1 text-xs">
+              <li>• All game payments go into a shared prize pool</li>
+              <li>• <span className="text-teal-300">Perfect Score (100):</span> Win the ENTIRE prize pool instantly!</li>
+              <li>• <span className="text-yellow-300">Round End:</span> Highest scorer wins the remaining pool</li>
+            </ul>
+          </section>
+
+          {/* Round System */}
+          <section>
+            <h3 className="text-yellow-400 font-bold mb-2">⏰ ROUND SYSTEM</h3>
+            <div className="bg-yellow-900/20 border border-yellow-400/30 p-3 rounded">
+              <ul className="space-y-1 text-xs">
+                <li>• <span className="text-yellow-300">24-hour rounds:</span> Each round lasts exactly 24 hours</li>
+                <li>• <span className="text-yellow-300">Auto restart:</span> Rounds automatically restart when time expires</li>
+                <li>• <span className="text-yellow-300">Prize pool reset:</span> Prize pool resets to 0 SOL when a new round starts</li>
+                <li>• <span className="text-yellow-300">Fresh start:</span> Every player gets a clean slate each round</li>
+                <li>• <span className="text-yellow-300">Winner takes all:</span> Round winner gets the entire accumulated prize pool</li>
+              </ul>
             </div>
-            
-            <div className="p-4 bg-emerald-900/30 rounded-lg border border-emerald-400/30">
-              <h3 className="text-emerald-300 font-bold mb-2">24-Hour Rounds</h3>
-              <p className="text-slate-300">Each round lasts exactly 24 hours. Make every game count!</p>
-            </div>
-            
-            <div className="p-4 bg-cyan-900/30 rounded-lg border border-cyan-400/30">
-              <h3 className="text-cyan-300 font-bold mb-2">Highest Score Wins</h3>
-              <p className="text-slate-300">If no jackpot is hit, the player with the highest score wins the prize pool.</p>
-            </div>
-            
-            <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-400/30">
-              <h3 className="text-yellow-300 font-bold mb-2">Tiebreaker Rule</h3>
-              <p className="text-slate-300">When scores are tied, the first player to achieve that score wins!</p>
-            </div>
-            
-            <div className="p-4 bg-pink-900/30 rounded-lg border border-pink-400/30">
-              <h3 className="text-pink-300 font-bold mb-2">Entry Fee</h3>
-              <p className="text-slate-300">Each game costs 0.05 GOR, which adds directly to the growing prize pool.</p>
-            </div>
-            
-            <div className="mt-8 pt-6 border-t border-teal-400/30 text-center">
-              <div className="text-teal-300 pixel-font text-lg font-bold">
-                Pay → Play → Win Big!
-              </div>
-              <div className="text-slate-400 pixel-font text-xs mt-2">
-                Time your tap perfectly to hit the trash can
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+          </section>
+
+          {/* Jackpot Rules */}
+          <section>
+            <h3 className="text-teal-400 font-bold mb-2">🎰 JACKPOT RULES</h3>
+            <ul className="space-y-1 text-xs">
+              <li>• Perfect score (100 points) = INSTANT JACKPOT</li>
+              <li>• Jackpot winner gets ALL prize pool funds immediately</li>
+              <li>• Round restarts immediately after jackpot</li>
+              <li>• Prize pool resets to 0 SOL after jackpot payout</li>
+            </ul>
+          </section>
+
+          {/* Strategy Tips */}
+          <section>
+            <h3 className="text-emerald-400 font-bold mb-2">💡 STRATEGY TIPS</h3>
+            <ul className="space-y-1 text-xs">
+              <li>• Watch the cursor movement pattern carefully</li>
+              <li>• The live score shows your potential points</li>
+              <li>• Aim for the center of the trash can for maximum points</li>
+              <li>• Early round = smaller prize pool, late round = bigger prizes</li>
+              <li>• Perfect timing beats speed - focus on accuracy!</li>
+            </ul>
+          </section>
+
+          {/* Technical Info */}
+          <section>
+            <h3 className="text-slate-400 font-bold mb-2">🔧 TECHNICAL INFO</h3>
+            <ul className="space-y-1 text-xs">
+              <li>• Built on Solana blockchain</li>
+              <li>• Payments processed via Backpack wallet</li>
+              <li>• Prize distribution is automatic</li>
+              <li>• All transactions are verifiable on-chain</li>
+            </ul>
+          </section>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
