@@ -20,7 +20,7 @@ const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
             <h3 className="text-teal-400 font-bold mb-2">🎮 GAME BASICS</h3>
             <ul className="space-y-1 text-xs">
               <li>• Connect your Backpack wallet to play</li>
-              <li>• Each game costs 0.05 SOL to play</li>
+              <li>• Each game costs 0.05 GOR to play</li>
               <li>• Time your tap to hit the moving trash can target</li>
               <li>• Score is based on accuracy (0-100 points)</li>
             </ul>
@@ -55,7 +55,7 @@ const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
               <ul className="space-y-1 text-xs">
                 <li>• <span className="text-yellow-300">24-hour rounds:</span> Each round lasts exactly 24 hours</li>
                 <li>• <span className="text-yellow-300">Auto restart:</span> Rounds automatically restart when time expires</li>
-                <li>• <span className="text-yellow-300">Prize pool reset:</span> Prize pool resets to 0 SOL when a new round starts</li>
+                <li>• <span className="text-yellow-300">Prize pool reset:</span> Prize pool resets to 0 GOR when a new round starts</li>
                 <li>• <span className="text-yellow-300">Fresh start:</span> Every player gets a clean slate each round</li>
                 <li>• <span className="text-yellow-300">Winner takes all:</span> Round winner gets the entire accumulated prize pool</li>
               </ul>
@@ -69,7 +69,7 @@ const HelpModal = ({ isOpen, onOpenChange }: HelpModalProps) => {
               <li>• Perfect score (100 points) = INSTANT JACKPOT</li>
               <li>• Jackpot winner gets ALL prize pool funds immediately</li>
               <li>• Round restarts immediately after jackpot</li>
-              <li>• Prize pool resets to 0 SOL after jackpot payout</li>
+              <li>• Prize pool resets to 0 GOR after jackpot payout</li>
             </ul>
           </section>
 

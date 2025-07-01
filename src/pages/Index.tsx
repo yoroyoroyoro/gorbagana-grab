@@ -123,7 +123,7 @@ const Index = () => {
     }
 
     if (gorBalance < 0.06) { // Increased buffer to account for fees
-      toast.error('Insufficient balance. You need at least 0.06 SOL to play (including transaction fees).');
+      toast.error('Insufficient balance. You need at least 0.06 GOR to play (including transaction fees).');
       return;
     }
 
@@ -132,10 +132,10 @@ const Index = () => {
     try {
       const fromPubkey = new PublicKey(publicKey);
       
-      console.log('Creating payment transaction for 0.05 SOL...');
+      console.log('Creating payment transaction for 0.05 GOR...');
       console.log('From:', fromPubkey.toString());
       console.log('To:', gorConnection.getTreasuryWallet().toString());
-      console.log('Current balance:', gorBalance.toFixed(4), 'SOL');
+      console.log('Current balance:', gorBalance.toFixed(4), 'GOR');
       
       // Create the payment transaction
       const transaction = await gorConnection.createGamePaymentTransaction(fromPubkey, 0.05);
@@ -173,7 +173,7 @@ const Index = () => {
       
       // Handle specific error types more gracefully
       if (error.message?.includes('Insufficient balance')) {
-        toast.error('Insufficient balance. Please add more SOL to your wallet.');
+        toast.error('Insufficient balance. Please add more GOR to your wallet.');
       } else if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
         toast.error('Transaction cancelled by user.');
       } else {
@@ -209,7 +209,7 @@ const Index = () => {
     // Check if this game won something
     const winnerGame = updatedRound.games.find(g => g.id === gameEntry.id);
     if (winnerGame && winnerGame.prize > 0) {
-      toast.success(`INSTANT JACKPOT! You won ${winnerGame.prize.toFixed(2)} SOL!`);
+      toast.success(`INSTANT JACKPOT! You won ${winnerGame.prize.toFixed(2)} GOR!`);
       
       updateStatsForGame(score, winnerGame.prize);
       
@@ -320,10 +320,10 @@ const Index = () => {
           <div className="text-center px-2">
             <div className="clean-card border-red-400/50 bg-red-900/30">
               <p className="text-red-300 pixel-font text-xs sm:text-sm">
-                NEED 0.05 SOL TO PLAY
+                NEED 0.05 GOR TO PLAY
               </p>
               <p className="text-red-500 pixel-font text-xs mt-2">
-                Current balance: {gorBalance.toFixed(4)} SOL
+                Current balance: {gorBalance.toFixed(4)} GOR
               </p>
             </div>
           </div>
