@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +20,27 @@ const PastWinnersPage = () => {
 
   useEffect(() => {
     loadPastWinners();
+  }, []);
+
+  // Listen for jackpot and round end events to refresh winners
+  useEffect(() => {
+    const handleJackpotWon = () => {
+      console.log('Jackpot won - refreshing past winners');
+      loadPastWinners();
+    };
+
+    const handleRoundEnded = () => {
+      console.log('Round ended - refreshing past winners');
+      loadPastWinners();
+    };
+
+    window.addEventListener('jackpotWon', handleJackpotWon);
+    window.addEventListener('roundEnded', handleRoundEnded);
+
+    return () => {
+      window.removeEventListener('jackpotWon', handleJackpotWon);
+      window.removeEventListener('roundEnded', handleRoundEnded);
+    };
   }, []);
 
   const loadPastWinners = () => {
