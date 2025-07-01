@@ -9,7 +9,7 @@ import { JackpotSystem } from '@/utils/jackpotSystem';
 interface Winner {
   player: string;
   prize: number;
-  winType: 'jackpot' | 'highest_score';
+  winType: 'jackpot' | 'highest_score' | 'test_prize';
   roundId: string;
   endTime: Date;
   transactionSignature?: string;
