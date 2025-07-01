@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,12 +27,18 @@ const PastWinnersPage = () => {
   useEffect(() => {
     const handleJackpotWon = () => {
       console.log('Jackpot won - refreshing past winners');
-      loadPastWinners();
+      // Add a small delay to ensure localStorage is updated
+      setTimeout(() => {
+        loadPastWinners();
+      }, 1000);
     };
 
     const handleRoundEnded = () => {
       console.log('Round ended - refreshing past winners');
-      loadPastWinners();
+      // Add a small delay to ensure localStorage is updated
+      setTimeout(() => {
+        loadPastWinners();
+      }, 1000);
     };
 
     window.addEventListener('jackpotWon', handleJackpotWon);
@@ -44,11 +51,14 @@ const PastWinnersPage = () => {
   }, []);
 
   const loadPastWinners = () => {
+    console.log('Loading past winners...');
     const roundsHistory = JackpotSystem.getRoundsHistory();
+    console.log('Rounds history:', roundsHistory);
     const pastWinners: Winner[] = [];
 
     roundsHistory.forEach(round => {
       if (round.winner) {
+        console.log('Found winner in round:', round.roundId, round.winner);
         pastWinners.push({
           player: round.winner.player,
           prize: round.winner.prize,
@@ -60,6 +70,7 @@ const PastWinnersPage = () => {
       }
     });
 
+    console.log('Past winners loaded:', pastWinners);
     setWinners(pastWinners);
   };
 
