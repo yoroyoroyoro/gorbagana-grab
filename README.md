@@ -1,4 +1,5 @@
 
+
 # Gorbagana Grab 🎮
 
 A retro-style web3 gaming experience built on the Gorbagana blockchain testnet. Test your reflexes, compete for prizes, and experience the future of decentralized gaming!
@@ -153,13 +154,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **Gorbagana Network**: [https://gorbagana.wtf/](https://gorbagana.wtf/)
 - **Backpack Wallet**: [https://backpack.app/](https://backpack.app/)
 
-## 📧 Support
-
-For support and questions:
-- Create an issue in this repository
-- Join our Discord community [Your Discord link]
-- Follow us on Twitter [Your Twitter handle]
-
 ---
 
 **Disclaimer**: This is a testnet application for demonstration purposes. Use testnet tokens only. Always verify transactions before confirming in your wallet.
+
