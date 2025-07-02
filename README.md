@@ -116,7 +116,7 @@ Gorbagana Grab is an interactive web-based game where players compete in real-ti
 ### Local Setup
 ```bash
 # Clone the repository
-git clone [your-repo-url]
+git clone https://github.com/yoroyoroyoro/gorbagana-grab.git
 
 # Install dependencies
 npm install
